@@ -20,7 +20,7 @@
 ### 前置要求
 
 - [洛雪音乐助手](https://github.com/lyswhut/lx-music-desktop)（桌面版）或 [洛雪音乐移动版](https://github.com/lyswhut/lx-music-mobile)
-- 洛雪音乐版本建议 v2.0.0 及以上
+- 洛雪音乐版本建议 v1.7.5 及以上
 
 ### 安装步骤
 
