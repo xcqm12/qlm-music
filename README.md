@@ -1,6 +1,11 @@
+好的，我将根据您提供的文件内容，对 README (1).md 进行更新，反映音源已升级至 v7.1.1 版本，并标注 v7.1.0 已废弃。
+
+这是更新后的 README (1).md 文件内容：
+
+```markdown
 七零喵聚合音源 · 超级整合版
 
-https://img.shields.io/badge/version-7.0.9-blue.svg
+https://img.shields.io/badge/version-7.1.1-blue.svg
 https://img.shields.io/badge/LX%20Music-支持-green.svg
 
 📖 简介
@@ -35,18 +40,19 @@ https://img.shields.io/badge/LX%20Music-支持-green.svg
 
 ```bash
 # GitHub 原始链接（国内可能需要代理）
-https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.9-AI%20Optimized.js
+https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.1.1.js
 
 # 备用链接（CDN）
-https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.0.9-AI%20Optimized.js
+https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.1.1.js
 ```
 
 方式二：本地文件导入
 
 1. 下载本仓库的以下任一版本文件：
-   · qlm-v7.0.9-AI Optimized.js（最新AI优化版，强烈推荐）
-   · qlm-v7.0.8.js（⚠️ 已废弃，请勿使用）
-   · qlm-v7.0.7.js（上一代稳定版）
+   · qlm-v7.1.1.js（最新完整版，强烈推荐）
+   · qlm-v7.1.1-fix.js（修复版，修复特定源错误）
+   · qlm-v7.1.0.js（⚠️ 已废弃，请勿使用）
+   · qlm-v7.0.9-AI Optimized.js（上一代AI优化版）
 2. 在洛雪音乐中选择「本地文件」方式导入
 3. 浏览选择下载的 .js 文件即可
 
@@ -59,9 +65,10 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.0.9-AI%20Optimized.js
 版本选择
 
 版本 说明 推荐场景
-v7.0.9-AI Optimized **最新AI优化版**，安全增强，修复内存泄漏与多源回退逻辑 强烈推荐
-v7.0.8 ⚠️ 已废弃！存在关键Bug，请勿使用。仅作为存档 仅供测试/存档
-v7.0.7 上一代完整版，修复 updateAlert 重复调用问题 稳定备选
+v7.1.1 **最新完整版**，集成预加载下一首，修复已知错误，优化音源切换逻辑 强烈推荐
+v7.1.1-fix **修复版**，专门修复ikun/聚合API/qorg错误，完善错误处理 问题排查/备用
+v7.1.0 ⚠️ 已废弃！存在关键Bug，请勿使用。仅作为存档 仅供测试/存档
+v7.0.9-AI Optimized 上一代AI优化版，功能稳定 稳定备选
 
 💡 建议始终使用最新版本，以获得最佳体验和最新的功能修复。
 
@@ -185,7 +192,10 @@ qorg音源 qorg 128k ~ 24bit
 📊 版本历史
 
 版本 更新内容
-v7.0.9-AI Optimized **最新版**，安全增强，修复内存泄漏，优化多源回退逻辑
+v7.1.1 **最新版**，集成预加载下一首功能，修复已知错误，优化音源切换逻辑
+v7.1.1-fix **修复版**，专门修复ikun/聚合API/qorg的响应解析及ID提取问题
+v7.1.0 ⚠️ 已废弃！存在关键Bug
+v7.0.9-AI Optimized 安全增强，修复内存泄漏，优化多源回退逻辑
 v7.0.8 ⚠️ 已废弃！存在关键Bug
 v7.0.7 修复 updateAlert 重复调用问题，优化稳定性
 v7.0.6 完整整合版，新增自建网易云音源，优化缓存策略
@@ -253,7 +263,10 @@ QQ 交流群 1006981142
 📦 文件下载
 
 文件名 版本 说明 下载
-qlm-v7.0.9-AI Optimized.js v7.0.9 **最新AI优化版** [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.9-AI%20Optimized.js)
+qlm-v7.1.1.js v7.1.1 **最新完整版** [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.1.1.js)
+qlm-v7.1.1-fix.js v7.1.1-fix **修复版** [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.1.1-fix.js)
+qlm-v7.1.0.js v7.1.0 ⚠️ 已废弃 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.1.0.js)
+qlm-v7.0.9-AI Optimized.js v7.0.9 上一代AI优化版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.9-AI%20Optimized.js)
 qlm-v7.0.8.js v7.0.8 ⚠️ 已废弃 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.8.js)
 qlm-v7.0.7.js v7.0.7 上一代稳定版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.7.js)
 qlm-v7.0.6.js v7.0.6 完整整合版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.6.js)
@@ -261,3 +274,4 @@ qlm-v7.0.5.js v7.0.5 尝鲜版 [下载](https://raw.githubusercontent.com/xcqm12
 qlm-v7.0.4.js v7.0.4 云盘优化版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.4.js)
 qlm-fix-v7.0.2.js v7.0.2 修复优化版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-fix-v7.0.2.js)
 qlm-v7.0.1.js v7.0.1 稳定备选版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.1.js)
+```
