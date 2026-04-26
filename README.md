@@ -275,6 +275,3 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.1.1-fix.js
 | qlm-v7.0.4.js | v7.0.4 | 云盘优化版 | [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.4.js) |
 | qlm-fix-v7.0.2.js | v7.0.2 | 修复优化版 | [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-fix-v7.0.2.js) |
 | qlm-v7.0.1.js | v7.0.1 | 稳定备选版 | [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.1.js) |
-```
-
----
