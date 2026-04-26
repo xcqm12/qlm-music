@@ -261,8 +261,3 @@ qlm-v7.0.5.js v7.0.5 尝鲜版 [下载](https://raw.githubusercontent.com/xcqm12
 qlm-v7.0.4.js v7.0.4 云盘优化版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.4.js)
 qlm-fix-v7.0.2.js v7.0.2 修复优化版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-fix-v7.0.2.js)
 qlm-v7.0.1.js v7.0.1 稳定备选版 [下载](https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.0.1.js)
-```
-
----
-
-如上，保留全部旧版本文件，主版本升级到 `v7.0.9-AI Optimized`。如有其他需要可以继续调整。
