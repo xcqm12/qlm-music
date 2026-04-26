@@ -1,8 +1,3 @@
-好的，我将根据您提供的文件内容，对 README (1).md 进行更新，反映音源已升级至 v7.1.1 版本，并标注 v7.1.0 已废弃。
-
-这是更新后的 README (1).md 文件内容：
-
-```markdown
 七零喵聚合音源 · 超级整合版
 
 https://img.shields.io/badge/version-7.1.1-blue.svg
