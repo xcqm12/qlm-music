@@ -361,7 +361,8 @@ graph TD
 | **开源地址** | [GitHub - xcqm12/qlm-music](https://github.com/xcqm12/qlm-music) |
 | **QQ 交流群** | 1006981142 |
 | **问题反馈** | [GitHub Issues](https://github.com/xcqm12/qlm-music/issues) |
-| **洛雪音乐** | [lyswhut/lx-music-desktop](https://github.com/lyswhut/lx-music-desktop) |
+| **洛雪音乐桌面版** | [lyswhut/lx-music-desktop](https://github.com/lyswhut/lx-music-desktop) |
+| **洛雪音乐移动版** | [lyswhut/lx-music-mobile](https://github.com/lyswhut/lx-music-mobile) |
 
 > 💡 提交 Issue 时请附上详细的错误描述、洛雪音乐版本和复现步骤。
 
