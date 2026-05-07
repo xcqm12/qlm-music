@@ -94,26 +94,28 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.1.2-ultimate-fix-v3.7.js
 
 📦 版本选择
 
-版本 状态 说明 推荐场景
-v7.1.2-ultimate-fix-v3.7 ⭐ 最新强烈推荐 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌，彻底消灭卡歌现象 🏆 强烈推荐
-v7.1.2-ultimate-fix-v3.6 ✅ 推荐 v3.6 增强 URL 提取与预检，长青/念心强制验证 追求稳定但无需兜底
-v7.1.2-ultimate-fix-v3.5 ✅ 推荐 v3.5 增加 Hermes 引擎兼容 Polyfill 老旧设备或特殊环境
+| 版本 | 状态 | 说明 | 推荐场景| 
+|--- --- | ---- --- | --- --- | 
+| v7.1.2-ultimate-fix-v3.7 | ⭐|  最新强烈推荐 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌，彻底消灭卡歌现象 🏆 强烈推荐
+| v7.1.2-ultimate-fix-v3.6|  ✅ | 推荐 v3.6 增强 URL 提取与预检，长青/念心强制验证 追求稳定但无需兜底
+| v7.1.2-ultimate-fix-v3.5 | ✅ | 推荐 v3.5 增加 Hermes 引擎兼容 Polyfill 老旧设备或特殊环境
 … … 更多历史版本请参阅仓库文件 按需选择
 
 ---
 
 🎵 支持的平台
 
-平台 标识 支持音质
-QQ音乐 tx 128k ~ 24bit
-网易云音乐 wy 128k ~ 24bit
-酷我音乐 kw 128k ~ 24bit
-酷狗音乐 kg 128k ~ 24bit
-咪咕音乐 mg 128k ~ 24bit
-汽水VIP qishui 128k ~ 24bit
-qorg音源（仅限网易云） qorg 128k ~ 24bit
-网易云盘 wycloud 128k ~ 24bit
-自建网易云 wycloudmusic 128k ~ flac
+|平台 | 标识 | 支持音质|
+|------|------|-----------|
+|QQ音乐| tx |128k ~ 24bit|
+|网易云音乐 |wy |128k ~ 24bit|
+|酷我音乐| kw |128k ~ 24bit|
+|酷狗音乐| kg |128k ~ 24bit|
+|咪咕音乐| mg |128k ~ 24bit|
+|汽水VIP |qishui |128k ~ 24bit|
+|qorg音源（仅限网易云）| qorg |128k ~ 24bit|
+|网易云盘| wycloud |128k ~ 24bit|
+|自建网易云 |wycloudmusic |128k ~ flac|
 
 ---
 
