@@ -92,14 +92,42 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.1.2-ultimate-fix-v3.7.js
 
 ---
 
-📦 版本选择
+## 📦 版本选择
 
-| 版本 | 状态 | 说明 | 推荐场景| 
-|-----|-----|-----|------| 
-| v7.1.2-ultimate-fix-v3.7 | ⭐|  最新强烈推荐 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌，彻底消灭卡歌现象|  🏆 强烈推荐 |
-| v7.1.2-ultimate-fix-v3.6|  ✅ | 推荐 v3.6 增强 URL 提取与预检，长青/念心强制验证 追求稳定但无需兜底
-| v7.1.2-ultimate-fix-v3.5 | ✅ | 推荐 v3.5 增加 Hermes 引擎兼容 Polyfill 老旧设备或特殊环境
-… … 更多历史版本请参阅仓库文件 按需选择
+> **🔥 最新发布版：`7.1.2-ultimate-merged-v5.2-enhanced.js`**  
+> 旗舰整合版，在 v5.1 基础上整合汽水VIP完整搜索/歌词，优化回退链，强化容错与性能，推荐所有用户升级。
+
+| 版本 | 状态 | 说明 | 推荐场景 |
+|-----|-----|-----|------|
+| **v7.1.2-ultimate-merged-v5.2-enhanced** | ⭐ **最新强烈推荐** | 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长青URL不可达、星海null字段、野花野草无URL、qorg/wyqlm多平台增强、失败自动跳歌等多项问题 | 🏆 强烈推荐 |
+| v7.1.2-ultimate-fix-v3.7 | ⭐ 推荐 | 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌 | 若不需要新版整合特性可继续使用 |
+| v7.1.2-ultimate-fix-v3.6 | ✅ 可用 | v3.6 增强 URL 提取与预检，长青/念心强制验证 | 追求稳定但无需兜底 |
+| v7.1.2-ultimate-fix-v3.5 | ✅ 可用 | v3.5 增加 Hermes 引擎兼容 Polyfill | 老旧设备或特殊环境 |
+
+<details>
+<summary><b>📜 历史版本（部分已弃用）</b></summary>
+
+> ⚠️ **注意**：`v3.8` 至 `v5.1` 版本已标记为弃用，不再推荐使用，可能存在已知问题或缺少最新增强，请优先使用 `v5.2-enhanced` 或 `v3.7`。
+
+以下为 `v7.1.2-ultimate-fix` 系列旧版本（按时间倒序）：
+
+| 版本 | 状态 | 说明 |
+|-----|-----|------|
+| v7.1.2-ultimate-fix-v3.7 | ⭐ 仍可用 | 终极兜底与自动跳歌 |
+| v7.1.2-ultimate-fix-v3.6 | ✅ 可用 | URL 深度提取与预检 |
+| v7.1.2-ultimate-fix-v3.6-fixed-patch1 | 🔧 已修补 | 长青/念心可达性补丁 |
+| v7.1.2-ultimate-fix-v3.5 | ✅ 可用 | Hermes 兼容 |
+| v7.1.2-ultimate-fix-v3.4 | ✅ 可用 | qorg 三重回退 |
+| v7.1.2-ultimate-fix-v3.3 | ✅ 可用 | qorg Bad Request 修复 |
+| v7.1.2-ultimate-fix-v3.2 | ✅ 可用 | qorg 主备回退 |
+| v7.1.2-ultimate-fix-v3.1 | ✅ 可用 | weapi/eapi 双加密强化 |
+| v7.1.2-ultimate-fix-v3 | ✅ 可用 | qorg ID 修复 |
+| v7.1.2-ultimate-fix-v2 | ✅ 可用 | 早期修复版本 |
+| … | … | 更早版本见仓库记录 |
+
+**`3.8` ~ `5.1` 为中间开发版本，已停止维护，请勿下载使用。**
+
+</details>
 
 ---
 
@@ -299,6 +327,8 @@ v7.1.2-ultimate-fix-v3 2026 ⭐ 终极修复版 v3，修复 qorg ID 丢失及参
 v7.1.2-ultimate-fix-v2 2026 ⭐ 终极修复版 v2，完善 weapi/eapi 双加密，修复 ID 缺失及 303 重定向处理，增强稳定性
 … … 更早版本见原仓库记录
 
+> **2026 全新整合分支**：`7.1.2-ultimate-merged-v5.2-enhanced` 在原有修复基础上整合旗舰优化，成为当前推荐版本。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
+
 ---
 
 🗺️ 路线图
@@ -317,6 +347,7 @@ v7.1.2-ultimate-fix-v2 2026 ⭐ 终极修复版 v2，完善 weapi/eapi 双加密
 · ✅ 引擎兼容性增强（Hermes Polyfill）
 · ✅ 智能 URL 深度提取与可达性验证
 · ✅ 终极兜底与自动跳歌（v3.7）
+· ✅ 旗舰整合版 v5.2-enhanced（汽水VIP全功能、修复增强、多平台完善）
 · ⬜ 图形化配置界面
 · ⬜ 音源健康检测
 · ⬜ 自定义音源优先级
