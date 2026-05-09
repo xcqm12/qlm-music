@@ -67,10 +67,10 @@
 
 ```bash
 # GitHub 原始链接（国内可能需要代理）
-https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v7.1.2-ultimate-fix-v3.7.js
+https://raw.githubusercontent.com/xcqm12/qlm-music/main/7.1.2-ultimate-merged-v5.2-enhanced.js
 
 # 备用链接（CDN，推荐）
-https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v7.1.2-ultimate-fix-v3.7.js
+https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/7.1.2-ultimate-merged-v5.2-enhanced.js
 ```
 
 💡 提示：使用在线导入方式，每次重启洛雪音乐时会自动检查更新。
