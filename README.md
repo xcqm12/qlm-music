@@ -400,7 +400,7 @@ graph TD
 
 | 渠道 | 信息 |
 |------|------|
-| 开源地址 | GitHub - xcqm12/qlm-music |
+| 开源地址 | [qlm-music开源地址](https://github.com/xcqm12/qlm-music) |
 | QQ 交流群 | 1006981142 |
 | 问题反馈 | GitHub Issues |
 | 洛雪音乐桌面版 | [洛雪音乐桌面版](https://github.com/lyswhut/lx-music-desktop)|
