@@ -1527,6 +1527,8 @@
 
         const brMap = { '128k': 128000, '192k': 192000, '320k': 320000, 'flac': 999000 };
         const br = brMap[quality] || 128000;
+        const levelMap = { '128k': 'standard', '192k': 'higher', '320k': 'high', 'flac': 'lossless' };
+        const level = levelMap[quality] || 'standard';
 
         try {
             const url = `${CONFIG.QORG_API_URL}/song/url?id=${sid}&br=${br}`;
@@ -1568,10 +1570,55 @@
             }
             throw new Error(resData?.message || freeTrialInfo ? '试听歌曲' : '无URL');
         } catch (e) {
-            console.warn('[qorg] eapi 失败:', e.message);
+            console.warn('[qorg] eapi 失败:', e.message, '→ 尝试 /song/url/v1');
         }
 
-        throw new Error('qorg: 所有获取方式均失败 (不加密 / weapi / eapi)');
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${sid}&level=${level}`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && res.data?.url) {
+                return validateUrl(res.data.url, 'qorg (v1)');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[qorg] /song/url/v1 失败:', e.message, '→ 尝试 /song/url/v1/302');
+        }
+
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1/302?id=${sid}`;
+            const redirectUrl = await httpGetRedirect(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (redirectUrl && redirectUrl.startsWith('http')) {
+                return validateUrl(redirectUrl, 'qorg (v1/302)');
+            }
+            throw new Error('302跳转无有效URL');
+        } catch (e) {
+            console.warn('[qorg] /song/url/v1/302 失败:', e.message, '→ 尝试 /song/url/v1 (lossless多ID)');
+        }
+
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${sid}&level=lossless`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && res.data?.url) {
+                return validateUrl(res.data.url, 'qorg (v1 lossless)');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[qorg] /song/url/v1 (lossless) 失败:', e.message, '→ 尝试 /song/url/v1 (多ID)');
+        }
+
+        try {
+            const idsParam = `${sid},${sid}`;
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${idsParam}&level=${level}`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && res.data?.url) {
+                return validateUrl(res.data.url, 'qorg (v1 multi-id)');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[qorg] /song/url/v1 (多ID) 失败:', e.message);
+        }
+
+        throw new Error('qorg: 所有获取方式均失败 (不加密 / weapi / eapi / v1 / v1/302 / v1-lossless / v1-multi)');
     }
 
     // ==================== qorg 搜索 ====================
@@ -1580,13 +1627,22 @@
         const cacheKey = `qorg_search_${keyword}_${page}`;
         const cached = state.searchCache.get(cacheKey);
         if (cached) return cached;
-        const res = await httpPost(CONFIG.QORG_API_URL + '/music/search', { keyword, page, pageSize }, 15000);
-        if (res?.code === 200 && res.data) {
-            const list = (res.data.list || []).map(item => ({
-                id: String(item.id || ''), songmid: item.id, name: item.name, singer: item.singer || item.artist,
-                albumName: item.album, duration: item.duration, pic: item.pic || item.cover, _source: 'qorg'
-            }));
-            const result = { isEnd: list.length < pageSize, list, total: res.data.total || list.length, page, limit: pageSize };
+        const res = await httpGet(CONFIG.QORG_API_URL + '/search', { keywords: keyword, limit: pageSize }, 15000);
+        let list = [];
+        if (Array.isArray(res)) list = res;
+        else if (res && res.data) list = Array.isArray(res.data) ? res.data : (res.data.list || res.data.songs || []);
+        const total = res?.data?.total || list.length;
+        if (list.length > 0) {
+            const result = {
+                isEnd: list.length < pageSize,
+                list: list.map((item, index) => ({
+                    id: String(item.id || ''), songmid: item.id, name: item.name || item.title || '未知歌曲',
+                    singer: item.singer || item.artist || '', albumName: item.album || item.albumname || '',
+                    duration: item.duration ? Math.floor(parseInt(item.duration) * 1000) : null,
+                    pic: item.pic || item.cover || '', _source: 'qorg'
+                })),
+                total, page, limit: pageSize
+            };
             state.searchCache.set(cacheKey, result);
             return result;
         }
@@ -1626,6 +1682,8 @@
 
         const brMap = { '128k': 128000, '192k': 192000, '320k': 320000, 'flac': 999000 };
         const br = brMap[quality] || 128000;
+        const levelMap = { '128k': 'standard', '192k': 'higher', '320k': 'high', 'flac': 'lossless' };
+        const level = levelMap[quality] || 'standard';
 
         try {
             const url = `${CONFIG.QORG_API_URL}/song/url?id=${sid}&br=${br}`;
@@ -1667,10 +1725,55 @@
             }
             throw new Error(resData?.message || freeTrialInfo ? '试听歌曲' : '无URL');
         } catch (e) {
-            console.warn('[wyqlm] eapi 失败:', e.message);
+            console.warn('[wyqlm] eapi 失败:', e.message, '→ 尝试 /song/url/v1');
         }
 
-        throw new Error('wyqlm: 所有获取方式均失败 (不加密 / weapi / eapi)');
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${sid}&level=${level}`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && res.data?.url) {
+                return validateUrl(res.data.url, 'wyqlm (v1)');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[wyqlm] /song/url/v1 失败:', e.message, '→ 尝试 /song/url/v1/302');
+        }
+
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1/302?id=${sid}`;
+            const redirectUrl = await httpGetRedirect(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (redirectUrl && redirectUrl.startsWith('http')) {
+                return validateUrl(redirectUrl, 'wyqlm (v1/302)');
+            }
+            throw new Error('302跳转无有效URL');
+        } catch (e) {
+            console.warn('[wyqlm] /song/url/v1/302 失败:', e.message, '→ 尝试 /song/url/v1 (lossless多ID)');
+        }
+
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${sid}&level=lossless`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && res.data?.url) {
+                return validateUrl(res.data.url, 'wyqlm (v1 lossless)');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[wyqlm] /song/url/v1 (lossless) 失败:', e.message, '→ 尝试 /song/url/v1 (多ID)');
+        }
+
+        try {
+            const idsParam = `${sid},${sid}`;
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${idsParam}&level=${level}`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && res.data?.url) {
+                return validateUrl(res.data.url, 'wyqlm (v1 multi-id)');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[wyqlm] /song/url/v1 (多ID) 失败:', e.message);
+        }
+
+        throw new Error('wyqlm: 所有获取方式均失败 (不加密 / weapi / eapi / v1 / v1/302 / v1-lossless / v1-multi)');
     }
 
     // ==================== 音乐可用性检查 ====================
@@ -1723,6 +1826,9 @@
 
     // ==================== fish ====================
     async function fishGetMusicUrl(platform, songInfo, quality) {
+        if (!['kg', 'kw', 'tx'].includes(platform)) {
+            throw new Error('fish: 不支持平台 ' + platform + '，仅支持 kg/kw/tx');
+        }
         let sid = getSongId(platform, songInfo);
         if (!sid) {
             try {
@@ -2361,9 +2467,7 @@
                 } else if (handler.name === '聚合API') {
                     url = await withTimeout(handler.fn(platform, { musicInfo: musicInfo, type: q }), timeout, handler.name + '超时');
                 } else {
-                    const sid = getSongId(platform, musicInfo);
-                    if (!sid) throw new Error(handler.name + ': 缺少歌曲ID');
-                    url = await withTimeout(handler.fn(platform, sid, q, musicInfo), timeout, handler.name + '超时');
+                    url = await withTimeout(handler.fn(platform, musicInfo, q), timeout, handler.name + '超时');
                 }
 
                 const validated = validateUrl(url, handler.name);
