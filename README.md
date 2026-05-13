@@ -1,13 +1,13 @@
 # 🎵 七零喵聚合音源 · 超级整合版
 
-![version](https://img.shields.io/badge/version-7.1.2--ultimate--fix--v3.7-blue.svg)
+![version](https://img.shields.io/badge/version-9.0.0-blue.svg)
 ![license](https://img.shields.io/badge/license-学习交流-green.svg)
 ![platform](https://img.shields.io/badge/平台-洛雪音乐-orange.svg)
 ![stars](https://img.shields.io/github/stars/xcqm12/qlm-music?style=social)
 
 ## 📖 项目简介
 
-**七零喵聚合音源** 是为 [洛雪音乐（LX Music）](https://github.com/lyswhut/lx-music-desktop) 设计的超级整合版音源脚本，集成 **20 余种音源 API**，支持 **weapi/eapi 双加密**，**qorg 三重回退（不加密/weapi/eapi）**，提供多源自动回退、**终极兜底自动跳歌**、智能缓存、预加载下一首、请求并发控制等功能，确保音乐播放的高稳定性和高可用性。
+**七零喵聚合音源** 是为 [洛雪音乐（LX Music）](https://github.com/lyswhut/lx-music-desktop) 设计的超级整合版音源脚本，集成 **20 余种音源 API**，支持 **weapi/eapi **，支持 weapi/ea[...]
 
 > 🎵 让音乐播放不再中断，让搜索更加智能。
 
@@ -16,17 +16,17 @@
 ## ✨ 主要特性
 
 ### 🎯 核心功能
-- **多音源聚合**：整合 ikun、聚合 API、qorg、星海（GD音乐台）、溯音、六音、独家音源、长青 SVIP、念心 SVIP、野花野草、Meting、汽水 VIP、肥猫系列、梓澄系列、Free listen、野草 等 20+ 音源
+- **多音源聚合**：整合 ikun、聚合 API、qorg、星海（GD音乐台）、溯音、六音、独家音源、长青 SVIP、念心 SVIP、野花野草、Meting、汽水 VIP、肥猫系列、梓[...]
 - **智能回退**：当一个音源失败时，自动按优先级切换到下一个可用音源，确保播放不中断
-- **终极兜底与自动跳歌（v3.7 新增）**：所有常规音源全部失败后，自动调用 `api.qlm.org.cn` 兜底接口，并跨平台（kg→kw→tx→wy 等）尝试获取音频链接；链接经过可达性验证，若最终仍无有效结果则返回空字符串，洛雪音乐自动跳过当前歌曲，彻底解决卡住问题
+- **终极兜底与自动跳歌（v3.7 新增）**：所有常规音源全部失败后，自动调用 `api.qlm.org.cn` 兜底接口，并跨平台（kg→kw→tx→wy 等）尝试获取音频链接；[...]
 - **智能缓存**：采用 LRU 缓存机制，减少重复网络请求，显著提升响应速度
 - **预加载下一首**：在播放当前歌曲时预加载下一首歌曲，实现无缝切换
 - **请求并发控制**：内置请求池，避免大量并发请求导致网络拥堵
 - **完善错误处理**：修复以往版本中 303 重定向、ID 缺失等关键问题，增强整体稳定性
 - **weapi/eapi 双加密**：网易云音乐接口支持 weapi 加密并自动回退 eapi，提升获取成功率
-- **平台专项修复**：qorg 音源（`api.qlm.org.cn`）仅限网易云平台，防止跨平台调用错误；ID 缺失时自动搜索补全；主接口失败时自动回退自建网易云端点；实现不加密 / weapi / eapi 三重保障
-- **引擎兼容性增强**：针对 Hermes 引擎（React Native）增加 Polyfill，修复 `Object.fromEntries` 与 `Array.prototype.includes` 缺失问题；完善全局对象与事件名称的安全获取，适配更多 LX Music 版本及运行环境
-- **智能 URL 提取与验证**：内置 `extractUrl` / `deepExtractUrl` 函数，深度递归提取各音源返回结构中的音频链接；`validateAudioUrl` 预检发送 HEAD 请求验证链接可达性，有效过滤无效/403 链接，大幅降低播放失败率
+- **平台专项修复**：qorg 音源（`api.qlm.org.cn`）仅限网易云平台，防止跨平台调用错误；ID 缺失时自动搜索补全；主接口失败时自动回退自建网易云端点；[...]
+- **引擎兼容性增强**：针对 Hermes 引擎（React Native）增加 Polyfill，修复 `Object.fromEntries` 与 `Array.prototype.includes` 缺失问题；完善全局对象与事件名称的安[...]
+- **智能 URL 提取与验证**：内置 `extractUrl` / `deepExtractUrl` 函数，深度递归提取各音源返回结构中的音频链接；`validateAudioUrl` 预检发送 HEAD 请求验证链接；[...]
 - **长青/念心 SVIP 增强**：增加 URL 可达性强制验证，避免返回不可播放的链接
 - **Free listen 酷我/酷狗改造**：复用肥猫音源，提升稳定性
 
@@ -67,10 +67,10 @@
 
 ```bash
 # GitHub 原始链接（国内可能需要代理）
-https://raw.githubusercontent.com/xcqm12/qlm-music/main/7.1.2-ultimate-merged-v5.2-enhanced.js
+https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v9.0.0.js
 
 # 备用链接（CDN，推荐）
-https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/7.1.2-ultimate-merged-v5.2-enhanced.js
+https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v9.0.0.js
 ```
 
 💡 提示：使用在线导入方式，每次重启洛雪音乐时会自动检查更新。
@@ -79,7 +79,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/7.1.2-ultimate-merged-v5.2-enhanced
 方式二：本地文件导入
 
 1. 从本仓库下载推荐版本文件：
-   · ⭐ qlm-v7.1.2-ultimate-fix-v3.7.js（最新终极修复版，新增终极兜底与自动跳歌，强烈推荐）
+   · ⭐ qlm-v9.0.0.js（最新版本，强烈推荐）
    · …（更多历史版本见文件列表）
 2. 在洛雪音乐中选择「本地文件」方式导入
 3. 浏览并选择下载的 .js 文件即可
@@ -94,12 +94,13 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/7.1.2-ultimate-merged-v5.2-enhanced
 
 ## 📦 版本选择
 
-> **🔥 最新发布版：`7.1.2-ultimate-merged-v5.2-enhanced.js`**  
-> 旗舰整合版，在 v5.1 基础上整合汽水VIP完整搜索/歌词，优化回退链，强化容错与性能，推荐所有用户升级。
+> **🔥 最新发布版：`qlm-v9.0.0.js`**  
+> 旗舰整合版，集成最新优化和增强功能，推荐所有用户升级。
 
 | 版本 | 状态 | 说明 | 推荐场景 |
 |-----|-----|-----|------|
-| **v7.1.2-ultimate-merged-v5.2-enhanced** | ⭐ **最新强烈推荐** | 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长青URL不可达、星海null字段、野花野草无URL、qorg/wyqlm多平台增强、失败自动跳歌等多项问题 | 🏆 强烈推荐 |
+| **qlm-v9.0.0** | ⭐ **最新强烈推荐** | 最新旗舰版本，整合最新增强与优化 | 所有用户 |
+| v7.1.2-ultimate-merged-v5.2-enhanced | ⭐ 推荐 | 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长[...] | 若不需要最新版本可继续使用 |
 | v7.1.2-ultimate-fix-v3.7 | ⭐ 推荐 | 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌 | 若不需要新版整合特性可继续使用 |
 | v7.1.2-ultimate-fix-v3.6 | ✅ 可用 | v3.6 增强 URL 提取与预检，长青/念心强制验证 | 追求稳定但无需兜底 |
 | v7.1.2-ultimate-fix-v3.5 | ✅ 可用 | v3.5 增加 Hermes 引擎兼容 Polyfill | 老旧设备或特殊环境 |
@@ -107,7 +108,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/7.1.2-ultimate-merged-v5.2-enhanced
 <details>
 <summary><b>📜 历史版本（部分已弃用）</b></summary>
 
-> ⚠️ **注意**：`v3.8` 至 `v5.1` 版本已标记为弃用，不再推荐使用，可能存在已知问题或缺少最新增强，请优先使用 `v5.2-enhanced` 或 `v3.7`。
+> ⚠️ **注意**：`v3.8` 至 `v5.1` 版本已标记为弃用，不再推荐使用，可能存在已知问题或缺少最新增强，请优先使用 `v9.0.0` 或 `v7.1.2-ultimate-merged-v5.2-enhanced`。
 
 以下为 `v7.1.2-ultimate-fix` 系列旧版本（按时间倒序）：
 
@@ -214,7 +215,7 @@ graph TD
 <details>
 <summary><b>Q1：部分歌曲无法播放？</b></summary>
 
-本音源采用多源回退 + 终极兜底机制，会自动尝试所有可用音源并验证链接可达性。v3.7 起所有常规音源失败后，还会调用兜底接口跨平台获取链接。如果仍然失败，建议：
+本音源采用多源回退 + 终极兜底机制，会自动尝试所有可用音源并验证链接可达性。v3.7 起所有常规音源失败后，还会调用兜底接口跨平台获取链接。如[...]
 
 · 尝试切换其他平台搜索
 · 降低音质要求（从 flac 降至 320k）
@@ -306,7 +307,7 @@ graph TD
 <details>
 <summary><b>Q9：终极兜底是什么？如何工作？</b></summary>
 
-终极兜底是 v3.7 新增的保底机制。当所有常规音源处理器均失败后，脚本会自动调用 api.qlm.org.cn 的通用音乐接口，并按 kg → kw → tx → wy 的顺序跨平台尝试获取音频链接；每条链接都会经过可达性预检。若仍无有效结果，则返回空字符串，洛雪音乐将自动跳至下一首歌曲，彻底避免卡在某一首无法播放的情况。
+终极兜底是 v3.7 新增的保底机制。当所有常规音源处理器均失败后，脚本会自动调用 api.qlm.org.cn 的通用音乐接口，并按 kg → kw → tx → wy 的顺序跨平台[...]
 
 </details>
 
@@ -314,20 +315,23 @@ graph TD
 
 📊 版本历史
 
-版本 日期 更新内容
-v7.1.2-ultimate-fix-v3.7 2026 🏆 终极修复版 v3.7，新增终极兜底机制：所有常规音源失败后自动调用 api.qlm.org.cn 跨平台（kg→kw→tx→wy）回退获取链接，并进行可达性验证；失败时返回空字符串，洛雪音乐自动跳过当前歌曲，彻底杜绝卡住现象。优化整体错误处理与自动跳歌逻辑。
-v7.1.2-ultimate-fix-v3.6 2026 🏆 终极修复版 v3.6，新增 extractUrl/deepExtractUrl 智能 URL 深度提取，解决星海等音源响应结构不定导致的提取失败；新增 validateAudioUrl 音频链接可达性预检；长青/念心 SVIP 强制验证；优化肥猫/梓澄系列 URL 提取；Free listen 酷我/酷狗改为复用肥猫音源；整体稳定性与成功率大幅提升
-v7.1.2-ultimate-fix-v3.6-fixed-patch1 2026 🔧 基于 v3.6 的增量修复，进一步强化长青/念心可达性验证逻辑，修复部分极端情况下提取遗漏
-v7.1.2-ultimate-fix-v3.5 2026 🏆 终极修复版 v3.5，新增 Hermes 引擎 Polyfill（兼容移动端），完善全局对象与事件名称安全获取，全面提升多环境稳定性与兼容性
-v7.1.2-ultimate-fix-v3.4 2026 🏆 终极修复版 v3.4，qorg 增加不加密第一回退（api.qlm.org.cn 自建网易云），实现“不加密 / weapi / eapi”三重保障；修复自建网易云 Cookie 集成问题；稳定性再创新高
-v7.1.2-ultimate-fix-v3.3 2026 🏆 终极修复版 v3.3，彻底修复 qorg Bad Request，改用稳定 /song/url 端点；weapi/eapi 双加密维持高成功率
-v7.1.2-ultimate-fix-v3.2 2026 🏆 终极修复版 v3.2，修复 api.qlm.org.cn 主接口获取失败，增加回退自建网易云端点；qorg 稳定性再升级
-v7.1.2-ultimate-fix-v3.1 2026 ⭐ 终极修复版 v3.1，强化 weapi/eapi 双加密稳定性，qorg 仅限网易云平台，修复 ID 丢失及参数错误
-v7.1.2-ultimate-fix-v3 2026 ⭐ 终极修复版 v3，修复 qorg ID 丢失及参数错误，完善 weapi/eapi 双加密，增强错误处理
-v7.1.2-ultimate-fix-v2 2026 ⭐ 终极修复版 v2，完善 weapi/eapi 双加密，修复 ID 缺失及 303 重定向处理，增强稳定性
-… … 更早版本见原仓库记录
+| 版本 | 日期 | 更新内容 |
+|-----|------|---------|
+| qlm-v9.0.0 | 2026 | 🎉 最新旗舰版本，集成最新增强优化 |
+| v7.1.2-ultimate-merged-v5.2-enhanced | 2026 | 🏆 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长[...] |
+| v7.1.2-ultimate-fix-v3.7 | 2026 | 🏆 终极修复版 v3.7，新增终极兜底机制：所有常规音源失败后自动调用 api.qlm.org.cn 跨平台（kg→kw→tx→wy）回退获取链接，[...] |
+| v7.1.2-ultimate-fix-v3.6 | 2026 | 🏆 终极修复版 v3.6，新增 extractUrl/deepExtractUrl 智能 URL 深度提取，解决星海等音源响应结构不定导致的提取失败；新增 validate[...] |
+| v7.1.2-ultimate-fix-v3.6-fixed-patch1 | 2026 | 🔧 基于 v3.6 的增量修复，进一步强化长青/念心可达性验证逻辑，修复部分极端情况下提取遗漏 |
+| v7.1.2-ultimate-fix-v3.5 | 2026 | 🏆 终极修复版 v3.5，新增 Hermes 引擎 Polyfill（兼容移动端），完善全局对象与事件名称安全获取，全面提升多环境稳定性与兼[...] |
+| v7.1.2-ultimate-fix-v3.4 | 2026 | 🏆 终极修复版 v3.4，qorg 增加不加密第一回退（api.qlm.org.cn 自建网易云），实现"不加密 / weapi / eapi"三重保障；修复自建网[...] |
+| v7.1.2-ultimate-fix-v3.3 | 2026 | 🏆 终极修复版 v3.3，彻底修复 qorg Bad Request，改用稳定 /song/url 端点；weapi/eapi 双加密维持高成功率 |
+| v7.1.2-ultimate-fix-v3.2 | 2026 | 🏆 终极修复版 v3.2，修复 api.qlm.org.cn 主接口获取失败，增加回退自建网易云端点；qorg 稳定性再升级 |
+| v7.1.2-ultimate-fix-v3.1 | 2026 | ⭐ 终极修复版 v3.1，强化 weapi/eapi 双加密稳定性，qorg 仅限网易云平台，修复 ID 丢失及参数错误 |
+| v7.1.2-ultimate-fix-v3 | 2026 | ⭐ 终极修复版 v3，修复 qorg ID 丢失及参数错误，完善 weapi/eapi 双加密，增强错误处理 |
+| v7.1.2-ultimate-fix-v2 | 2026 | ⭐ 终极修复版 v2，完善 weapi/eapi 双加密，修复 ID 缺失及 303 重定向处理，增强稳定性 |
+| … | … | 更早版本见原仓库记录 |
 
-> **2026 全新整合分支**：`7.1.2-ultimate-merged-v5.2-enhanced` 在原有修复基础上整合旗舰优化，成为当前推荐版本。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
+> **2026 全新整合分支**：`qlm-v9.0.0` 为最新旗舰版本。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
 
 ---
 
@@ -348,6 +352,7 @@ v7.1.2-ultimate-fix-v2 2026 ⭐ 终极修复版 v2，完善 weapi/eapi 双加密
 · ✅ 智能 URL 深度提取与可达性验证
 · ✅ 终极兜底与自动跳歌（v3.7）
 · ✅ 旗舰整合版 v5.2-enhanced（汽水VIP全功能、修复增强、多平台完善）
+· ✅ 最新旗舰版 v9.0.0（最新增强与优化）
 · ⬜ 图形化配置界面
 · ⬜ 音源健康检测
 · ⬜ 自定义音源优先级
@@ -393,12 +398,13 @@ v7.1.2-ultimate-fix-v2 2026 ⭐ 终极修复版 v2，完善 weapi/eapi 双加密
 
 📞 交流反馈
 
-渠道 信息
-开源地址 GitHub - xcqm12/qlm-music
-QQ 交流群 1006981142
-问题反馈 GitHub Issues
-洛雪音乐桌面版 lyswhut/lx-music-desktop
-洛雪音乐移动版 lyswhut/lx-music-mobile
+| 渠道 | 信息 |
+|------|------|
+| 开源地址 | GitHub - xcqm12/qlm-music |
+| QQ 交流群 | 1006981142 |
+| 问题反馈 | GitHub Issues |
+| 洛雪音乐桌面版 | lyswhut/lx-music-desktop |
+| 洛雪音乐移动版 | lyswhut/lx-music-mobile |
 
 💡 提交 Issue 时请附上详细的错误描述、洛雪音乐版本和复现步骤。
 
@@ -408,22 +414,23 @@ QQ 交流群 1006981142
 
 本音源整合了以下优秀项目/服务的 API，特此致谢：
 
-音源 说明
-ikun 音源 多平台音源支持
-聚合 API (juhe) 聚合接口服务
-qorg API 自建音源服务
-星海 API (GD音乐台) GDStudio 音乐服务
-溯音 API oiapi.net 提供
-六音音源 sixyin.com
-独家音源 洛雪科技提供
-长青 SVIP / 念心 SVIP SVIP 音源
-汽水 VIP 高音质支持
-肥猫 / 肥猫不肥 公益音源
-梓澄公益系列 公益音源
-Free listen 免费音源
-野草音源 酷我专用
-Meting API 备用 API
-自建网易云音乐 API qlm.org.cn
+| 音源 | 说明 |
+|-----|------|
+| ikun 音源 | 多平台音源支持 |
+| 聚合 API (juhe) | 聚合接口服务 |
+| qorg API | 自建音源服务 |
+| 星海 API (GD音乐台) | GDStudio 音乐服务 |
+| 溯音 API | oiapi.net 提供 |
+| 六音音源 | sixyin.com |
+| 独家音源 | 洛雪科技提供 |
+| 长青 SVIP / 念心 SVIP | SVIP 音源 |
+| 汽水 VIP | 高音质支持 |
+| 肥猫 / 肥猫不肥 | 公益音源 |
+| 梓澄公益系列 | 公益音源 |
+| Free listen | 免费音源 |
+| 野草音源 | 酷我专用 |
+| Meting API | 备用 API |
+| 自建网易云音乐 API | qlm.org.cn |
 
 ---
 
