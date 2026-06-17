@@ -1,12 +1,4 @@
-<button onclick="window.open('https://www.paypal.com/myaccount/transfer/homepage/buy/preview')" style="
-  background: #ff6b6b;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background 0.3s;
-">
-  ☕ 赞助支持
-</button>
+github: [xcqm12]
+ko_fi: xcqm12
+buy_me_a_coffee: 你的Buy Me a Coffee用户名
+custom: ['https://ko-fi.com/s/821bf462c9']
