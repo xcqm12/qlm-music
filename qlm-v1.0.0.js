@@ -754,14 +754,66 @@
     // ==================== 辅助函数 ====================
     function getSongId(platform, info) {
         if (!info) return null;
+        
+        // 尝试从多个可能的字段中获取ID
+        const possibleIds = [
+            info.id,
+            info.songid,
+            info.songmid,
+            info.strMediaMid,
+            info.hash,
+            info.audio_id,
+            info.cid,
+            info.vid,
+            info.musicId,
+            info.trackId,
+            info.songId,
+            info.track_id,
+            info.music_id,
+            info.song_id,
+            info.mediaId,
+            info.media_id,
+            info.songIdStr,
+            info.idStr,
+            (info.meta && info.meta.id),
+            (info.meta && info.meta.songid),
+            (info.meta && info.meta.songmid),
+            (info.meta && info.meta.cid),
+            (info.data && info.data.id),
+            (info.data && info.data.songid),
+            (info.data && info.data.songmid)
+        ];
+        
+        // 根据平台优先返回特定格式的ID
         switch (platform) {
-            case 'tx': return info.songmid || info.strMediaMid || info.id;
-            case 'wy': return info.id || info.songid;
-            case 'kw': return info.hash || info.audio_id || info.id;
-            case 'kg': return info.hash || info.audio_id || info.id;
-            case 'mg': return info.songmid || info.id || info.cid || (info.meta && (info.meta.songmid || info.meta.id || info.meta.cid));
-            default: return info.id || info.songmid || info.hash;
+            case 'tx': 
+                return info.songmid || info.strMediaMid || info.id || 
+                       info.vid || findValidId(possibleIds);
+            case 'wy': 
+                return info.id || info.songid || info.songmid || 
+                       findValidId(possibleIds);
+            case 'kw': 
+                return info.hash || info.audio_id || info.id || 
+                       findValidId(possibleIds);
+            case 'kg': 
+                return info.hash || info.audio_id || info.id || 
+                       info.songid || findValidId(possibleIds);
+            case 'mg': 
+                return info.songmid || info.id || info.cid || 
+                       (info.meta && (info.meta.songmid || info.meta.id || info.meta.cid)) ||
+                       findValidId(possibleIds);
+            default: 
+                return findValidId(possibleIds);
         }
+    }
+    
+    function findValidId(ids) {
+        for (const id of ids) {
+            if (id !== null && id !== undefined && id !== '') {
+                return String(id);
+            }
+        }
+        return null;
     }
     
     function validateUrl(url, sourceName) {
@@ -1052,15 +1104,60 @@
     
     // qorg
     async function qorgGetMusicUrl(platform, songInfo, quality) {
-        const songId = getSongId(platform, songInfo);
-        if (!songId) throw new Error('qorg: 缺少歌曲ID');
+        if (platform !== 'wy' && platform !== 'wycloudmusic') {
+            throw new Error(`qorg: 不支持平台 ${platform}，仅支持 wy/wycloudmusic`);
+        }
+
+        const info = songInfo || {}, meta = info.meta || {};
+        let sid = info.hash || info.songmid || info.id || info.songId;
+        if (!sid) sid = meta.hash || meta.songmid || meta.id;
+        if (!sid && platform === 'wy') sid = meta.songmid || meta.id || info.songmid;
+        if (!sid && platform === 'wycloudmusic') sid = info.songmid || info.id || meta.id;
+        if (!sid) sid = info.trackId || info.song_id || info.track_id;
+        if (!sid) sid = meta.trackId || meta.song_id || meta.track_id;
+
+        if (!sid) {
+            const keyword = info.name || info.title || '';
+            const singer = info.singer || info.artist || '';
+            if (keyword) {
+                console.warn(`[qorg] ID缺失，尝试通过 api.qlm.org.cn 搜索补全: ${keyword} ${singer}`);
+                try {
+                    const searchRes = await qorgSearch(keyword, 1, 5);
+                    if (searchRes && searchRes.list && searchRes.list.length > 0) {
+                        let match = searchRes.list[0];
+                        if (singer) {
+                            const better = searchRes.list.find(item =>
+                                (item.singer || '').includes(singer) || singer.includes(item.singer || '')
+                            );
+                            if (better) match = better;
+                        }
+                        let foundId = match.id || match.songmid;
+                        if (typeof foundId === 'object' && foundId !== null) {
+                            foundId = foundId.id || foundId.songmid || foundId;
+                        }
+                        if (typeof foundId === 'number') foundId = String(foundId);
+                        if (typeof foundId === 'string' && foundId && foundId !== 'undefined' && foundId !== 'null') {
+                            sid = foundId;
+                            console.log(`[qorg] 搜索补全 ID: ${sid} (${match.name} - ${match.singer})`);
+                        }
+                    }
+                } catch (e) { console.warn('[qorg] 搜索补全失败:', e.message); }
+            }
+        }
+
+        if (!sid) throw new Error('qorg: 缺少歌曲ID，且搜索补全未成功');
         
+        sid = String(sid).trim();
+        if (!sid || sid === 'undefined' || sid === 'null') {
+            throw new Error('qorg: 无效的歌曲ID');
+        }
+
         const sourceMap = { wy: 'netease', wycloudmusic: 'netease' };
         const source = sourceMap[platform] || 'netease';
         
         const res = await httpPost(`${CONFIG.QORG_API_URL}/music/url`, {
             platform: source,
-            id: songId,
+            id: sid,
             quality: quality || '320k'
         }, CONFIG.REQUEST_TIMEOUT);
         
@@ -1068,6 +1165,29 @@
             return res.data.url;
         }
         throw new Error('qorg获取失败');
+    }
+    
+    // ==================== qorg 搜索函数 ====================
+    async function qorgSearch(keyword, page, pageSize) {
+        if (!keyword) return { isEnd: true, list: [], total: 0, page, limit: pageSize };
+        const res = await httpGet(CONFIG.QORG_API_URL + '/search', { keywords: keyword, limit: pageSize }, 15000);
+        let list = [];
+        if (Array.isArray(res)) list = res;
+        else if (res && res.data) list = Array.isArray(res.data) ? res.data : (res.data.list || res.data.songs || []);
+        const total = res?.data?.total || list.length;
+        if (list.length > 0) {
+            return {
+                isEnd: list.length < pageSize,
+                list: list.map((item, index) => ({
+                    id: String(item.id || ''), songmid: item.id, name: item.name || item.title || '未知歌曲',
+                    singer: item.singer || item.artist || '', albumName: item.album || item.albumname || '',
+                    duration: item.duration ? Math.floor(parseInt(item.duration) * 1000) : null,
+                    pic: item.pic || item.cover || '', _source: 'qorg'
+                })),
+                total, page, limit: pageSize
+            };
+        }
+        return { isEnd: true, list: [], total: 0, page, limit: pageSize };
     }
     
     // wyqlm
