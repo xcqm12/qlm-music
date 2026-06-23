@@ -1,13 +1,13 @@
 # 🎵 七零喵聚合音源 · 超级整合版
 
-![version](https://img.shields.io/badge/version-9.0.0-blue.svg)
+![version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![license](https://img.shields.io/badge/license-学习交流-green.svg)
 ![platform](https://img.shields.io/badge/平台-洛雪音乐-orange.svg)
 ![stars](https://img.shields.io/github/stars/xcqm12/qlm-music?style=social)
 
 ## 📖 项目简介
 
-**七零喵聚合音源** 是为 [洛雪音乐（LX Music）](https://github.com/lyswhut/lx-music-desktop) 设计的超级整合版音源脚本，集成 **20 余种音源 API**，支持 **weapi/eapi **，支持 weapi/ea[...]
+**七零喵聚合音源** 是为 [洛雪音乐（LX Music）](https://github.com/lyswhut/lx-music-desktop) 设计的超级整合版音源脚本，集成 **28 余种音源 API**，支持 **weapi/eapi** 双加密，基于 v7.0.7 架构重构，整合 v9.0.9 全部音源，打造新一代重构版 1.0.0。
 
 > 🎵 让音乐播放不再中断，让搜索更加智能。
 
@@ -67,10 +67,10 @@
 
 ```bash
 # GitHub 原始链接（国内可能需要代理）
-https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v9.0.0.js
+https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v1.0.0.js
 
 # 备用链接（CDN，推荐）
-https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v9.0.0.js
+https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0.js
 ```
 
 💡 提示：使用在线导入方式，每次重启洛雪音乐时会自动检查更新。
@@ -79,7 +79,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v9.0.0.js
 方式二：本地文件导入
 
 1. 从本仓库下载推荐版本文件：
-   · ⭐ qlm-v9.0.0.js（最新版本，强烈推荐）
+   · ⭐ qlm-v1.0.0.js（最新版本，强烈推荐）
    · …（更多历史版本见文件列表）
 2. 在洛雪音乐中选择「本地文件」方式导入
 3. 浏览并选择下载的 .js 文件即可
@@ -94,12 +94,13 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v9.0.0.js
 
 ## 📦 版本选择
 
-> **🔥 最新发布版：`qlm-v9.0.0.js`**  
-> 旗舰整合版，集成最新优化和增强功能，推荐所有用户升级。
+> **🔥 最新发布版：`qlm-v1.0.0.js`**  
+> 重构版 1.0.0，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源，推荐所有用户升级。
 
 | 版本 | 状态 | 说明 | 推荐场景 |
 |-----|-----|-----|------|
-| **qlm-v9.0.0** | ⭐ **最新强烈推荐** | 最新旗舰版本，整合最新增强与优化修复了部分问题 | 所有用户 |
+| **qlm-v1.0.0** | ⭐ **最新强烈推荐** | 重构版 1.0.0，基于 v7.0.7 架构重构，整合 v9.0.9 全部音源，修复初始化失败、not a function 错误、缺失音源函数等问题 | 所有用户 |
+| qlm-v9.0.0 | ✅ 可用 | 旗舰整合版，集成最新优化和增强功能 | 历史版本兼容 |
 | v7.1.2-ultimate-merged-v5.2-enhanced | ⭐ 推荐 | 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长[...] | 若不需要最新版本可继续使用 |
 | v7.1.2-ultimate-fix-v3.7 | ⭐ 推荐 | 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌 | 若不需要新版整合特性可继续使用 |
 | v7.1.2-ultimate-fix-v3.6 | ✅ 可用 | v3.6 增强 URL 提取与预检，长青/念心强制验证 | 追求稳定但无需兜底 |
@@ -317,7 +318,8 @@ graph TD
 
 | 版本 | 日期 | 更新内容 |
 |-----|------|---------|
-| qlm-v9.0.0 | 2026 | 🎉 最新旗舰版本，集成最新增强优化 |
+| **qlm-v1.0.0** | 2026 | 🎉 **重构版 1.0.0**，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源；修复初始化失败问题；修复 not a function 错误；修复 Network request failed 问题；修复 星海备缺少歌曲ID 问题；添加缺失的音源处理函数（肥猫不肥、梓澄qwq、梓澄公益2代、聚合API、野花野草、Meting、Free listen、独家音源）；添加 PLATFORM_TO_SOURCE 配置；添加 httpFetch 工具函数 |
+| qlm-v9.0.0 | 2026 | 🎉 旗舰整合版，集成最新增强优化 |
 | v7.1.2-ultimate-merged-v5.2-enhanced | 2026 | 🏆 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长[...] |
 | v7.1.2-ultimate-fix-v3.7 | 2026 | 🏆 终极修复版 v3.7，新增终极兜底机制：所有常规音源失败后自动调用 api.qlm.org.cn 跨平台（kg→kw→tx→wy）回退获取链接，[...] |
 | v7.1.2-ultimate-fix-v3.6 | 2026 | 🏆 终极修复版 v3.6，新增 extractUrl/deepExtractUrl 智能 URL 深度提取，解决星海等音源响应结构不定导致的提取失败；新增 validate[...] |
@@ -331,7 +333,7 @@ graph TD
 | v7.1.2-ultimate-fix-v2 | 2026 | ⭐ 终极修复版 v2，完善 weapi/eapi 双加密，修复 ID 缺失及 303 重定向处理，增强稳定性 |
 | … | … | 更早版本见原仓库记录 |
 
-> **2026 全新整合分支**：`qlm-v9.0.0` 为最新旗舰版本。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
+> **2026 全新重构分支**：`qlm-v1.0.0` 为最新重构版本，基于 v7.0.7 架构重构，整合 v9.0.9 全部音源。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
 
 ---
 
@@ -352,7 +354,8 @@ graph TD
 · ✅ 智能 URL 深度提取与可达性验证
 · ✅ 终极兜底与自动跳歌（v3.7）
 · ✅ 旗舰整合版 v5.2-enhanced（汽水VIP全功能、修复增强、多平台完善）
-· ✅ 最新旗舰版 v9.0.0（最新增强与优化）
+· ✅ 旗舰版 v9.0.0（最新增强与优化）
+· ✅ **重构版 1.0.0**（基于 v7.0.7 架构重构，整合 v9.0.9 全部音源）
 · ⬜ 图形化配置界面
 · ⬜ 音源健康检测
 · ⬜ 自定义音源优先级
