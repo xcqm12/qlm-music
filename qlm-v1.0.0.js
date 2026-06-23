@@ -500,10 +500,7 @@
         
         // 汽水 VIP API
         QISHUI_API_URL: "https://api.vsaa.cn/api/music.qishui.vip",
-        
-        // GD音乐台 API
-        GD_API_URL: "https://api.gzyyds.xyz",
-        
+
         // 缓存配置
         CACHE_TTL_URL: 1800000,
         CACHE_TTL_SEARCH: 300000,
@@ -528,7 +525,7 @@
         PRELOAD_QUALITY: '320k',
         
         // 网易云Cookie
-        NETEASE_CLOUD_COOKIE_KEY: '_ntes_nnid=53b32208d3ff4825ff51d9f5ce806c98,1769180254932; _ntes_nuid=53b32208d3ff4825ff51d9f5ce806c98; NMTID=00OOaxZpza_Cxj1Y0CWrpkk8PxmwgQAAAGb61xCIA; __snaker__id=XONHI2Gv80iNHZ7Z; WM_TID=oMlXAq8tKP9BAAUAUQaH2qjeM7QpK88Y; _iuqxldmzr_=32; ntes_kaola_ad=1; NTES_P_UTID=SL9imFoa8rYLTnjVYulzxKhb8y7KdyaJ|1771482585; P_INFO=m18651415610@163.com|1771482585|1|phoenix_client|00&99|jis&1771231192&ntesgod_app#jis&320600#10#0#0|186610&1|godlike_app&ntesgod_app|18651415610@163.com; timing_user_id=time_DH7EWvPb5c; __csrf=ace47455bd906e2ad7fe4cc7d8037df7; ntes_utid=tid._.jwb%252F%252BPn0SKZFVwFAVFfG27jbMrEr96km._.0.%2C.edd._.._.0; WM_NI=wmTqWxKPadpv2R1Sl%2FL71iPeMqaPPSgsHfRDh5gFoFhw%2BdtTQNwudVJTuUy3dzKramThieOCi2AEAVSXSFGJfZMZoEgm1BM6IGeBVCDCyguAITGs%2BucZMoLOfHCVGQLHRzc%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6eed3ea59a5bb8f9ad03fbbb88fa7d45a839a8f86cb40adb99cb8c94089e9a891d02af0fea7c3b92ab5b39c92d6748990af85f37ef28effb4ef2590e9ff8ad36f8fafafb1d359a5ad8887d150aceba9a7ee4eaca9e585f7609392b996e75e8a8cbbb6fc39a8a68593e46798b8a786ce49abee8fa6c45e91889da7c642a68683bbee4fa5b3ffa3d03e8b99aba3d549889db788f84b8b8c8994aa7fa1868390cf45a6988db7c65b90989e9be237e2a3; sDeviceId=YD-3OtYltVMdiJBBlRQUALW00QfWedU6OPa; gdxidpyhxdE=S6ckMD1I59fzIq2mcYwO%2B4VZ%2B8U8PfUma2GxE8SxygCCDvmuyloO98TxhOuSUb2pZaBvafz1Av2C2iRBANnAyd%2F8YarYixKetVlVcQYXPRZK6eRnQTeIH%2FbPE%2Ff6CL8In%5Cjcs0AuQ0SZBYKBqX3Q8SRbYJWfZi5VSQmeB1rf%2BYxCRSOf%3A1776554702285; __csrf=ac6803ad8d0db7317192d383647bcaaa; MUSIC_U=00B796682748D09558E2ABEB6FBD4AA522F7DCF616DEE627874471536C93E70252168B237C84F13A5319DBCF0CCB01A10B8DA408D0CFDAD390DD530BAD2FDBC1E601B69C9A54B37FD1D9920201ECA320EBE4B5AD3586E4F97376D20309CC70653C182CA345A63256963297B872FE906EBFD1E5D374703CB7609C68E0882336534F86F8B52AB9311F0551B610A45B1138B3E284CB2B78A98E86AD070D5274BD3532EC94A671542B90E998DF3CF9B697A8AC9D4F225091CC6F6B591A1C3B5C96E41BE342216FC1F772AFBEA054FA75BFFB7D35681097CEAADB42606BED6476E4FC6374A9393DBC2F4BFA58B108851F6131BE1A18161CB41879B698063E1980326FEF55695077247856B0FEAA11C89A24E91D66E4BB40EF1924BE95EB2B3437951819236090CECEE6C07653775FBFFAD948ED1D3B452AF78AC5B759F84C214ACA9303268733F678B3262D20ECA60DA7B197C157FB837595C4A29BB6A048CCA90AE7A5DC431FEF70186C422B1385632BE8A1BB12A753771AE8F068F48745E7B24539C633646D511F06EA6D6F21E16CE76618930AB33E531C52FC599DF627F5FDD2ACCE; JSESSIONID-WYYY=hKJT%5CNZV%2BBqCQ3nfwDj0H7d0xTvhBI84rEp%2BF76gEaoVM%5CjzGGQEtBjk%2FyiwpwEVXlavVp9DBYfB49iUN77UZthvo9noD%5CAGwzx8HZDkIryRQZpzCPsgzCm4wZbZKExXxBNJxzTssaUTFtDBCHZT7juCauylsAhNBaJgrnzY5agj%2FOlU%3A1776556842084',
+        NETEASE_CLOUD_COOKIE_KEY: '_ntes_nnid=ca52af08faf87b9f2eda20485867f88c,1767836662172; _ntes_nuid=ca52af08faf87b9f2eda20485867f88c; NMTID=00OMSCK1Ll4WQxHF0wWh5E930LCDBQAAAGbm0a7Xw; WEVNSM=1.0.0; WNMCID=uikhjc.1767836663568.01.0; __snaker__id=Qn11uFiUM6vHvXay; WM_TID=NzeRyGqHxsxEFVUBRULD2sOaZDjj2Nzn; _iuqxldmzr_=32; MUSICIAN_COMPANY_LAST_ENTRY=1662683424_musician; ntes_utid=tid._.5Iyiv%252F3d%252BpZAU1QAURLD35bbZXsTD8Tz._.0.%2C.edd._.._.0; sDeviceId=YD-aZunqrfBN6BAAgFBABODnTCWg57Vcy2X; ntes_kaola_ad=1; NTES_P_UTID=0MNaXkD2b0n2gGWUC6lRzkkVfWzxpUap|1777625817; P_INFO=xcqm12@126.com|1777625817|1|phoenix_client|00&99|jis&1777560574&phoenix_client#jis&320600#10#0#0|&0|godlike_app&mbmail_android&ntesgod_app&mtoken_client&phoenix_client|xcqm12@126.com; __csrf=096f7a578ac9591d6c1f636b88b6a139; gdxidpyhxdE=E4Hr%2BNhJJ6bUP1EDbjGxJw7vCob71rQEaLkB2aDtXmm65wlZxjAC9ILDwXxHfGYcI%2B5PBd%2FVtUKQvt5queAJf4rL%2BHv8QOX1V5yrmAqWu1etpKKiHperc8RidsnEWbrD6XSURYYd%2BqNqw0a1SfBehkQIiyqOc5J5b7RcZy%5CkQ0X3hUJs%3A1782094060043; MUSIC_U=0053C8FF0D8F38CE69E31E98D55208A9D3F6247DBD447A3B380E49FF235988C34B371B7EAF66D752AEB992E765D87960D1B72E04AD1A4A09338E30ABBB057F3F794E9DED48B40D1E6D5A930ECC8A9FDEE76F19C74218A681B307249A014A0B807A95C312435B72111F76F44874EF6B91DEAEAF64E1CC28DB32549A6C6E4B06A89CC394341D7E9E4F468B3E0C835252BE9DF0B6EB2F2FAD72A5C6C8B799F781A478F45C8935F9C3445885F42F35C3BFFDC4993143A042717046042E54519F45F2C0B3274592D805000D8643115B2AA2F5A04CC90D278A589C866773CE26D1CBF042A2D10B7162BABE7BD27162B243FF1EAD3E493D438B108DD1D4592F5B0354E75CE628BFBBD1238C76C6707E90FAC74E0F853EB3D1FA8873DEDE0BF45C542DE156A25951E47AD466900D7D86F7B1099302A8CAEB4F8B6C9D1C64542A8946665C3FE8E95468DF9FE8BF32AF6FA5E269B4C47D8E946CC17F2C98BB063C048BB7F0D33FBF97E8CC7473CAFECF6EA641E150B53B637B9E8028ABD31DEB0FB3175ED976FF6C0A5E0EF0F5D288793FDDDDEADA5B6B3672B043CACB681C50FE3CCEA3232B; __csrf=c139c0f6418d18c1d566958db87cb4fc; JSESSIONID-WYYY=6TBY0CAs2lVul3wtkHITbyZzZlnD9ly9JsoxH7BPPFiPbkoq2fbqGetB%2FAV7nJI7Ox4Z%2FTGs%5CYct8B6a%2BXiCFthINrdVHsxuKFmV7Nn%2FiBzIJSH5Uu4o4X5jUOxy3w6sixGw4z6iCK4GmfBsJTXtKCN0a6cfBr6SIq2RyxmWhryvoVVO%3A1782213413307; WM_NI=sLFFobH41VKKv35bO7wb906suF9M7qnsR2jlbFxcyfGNaPCrjJixtQkLB3ayI4WDsNJf38JB%2FLiMGlGLVBazjql0wYMnwi7JUZXqEdCplRI3prmbbyX0RNwK%2BUQu6PO5ek4%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6eeaaf36d899f00b2f525fc9a8eb2c15f928e9bb0d221a2e7ffb6b134a29effafd02af0fea7c3b92ab1948aa7ee6a8cecffb7ca41b6edfb83ce3db5bef7d1b579b79af7aeb67baead9ed3e968a29ab884fc6e8592afb1c27aaa96a799f75ba9948ed4e4738bec99a5f2468abafdd9c94aed94a7aec66885949aa3e472aaafa4d1f6538fb2b98ab64297869892c87081b0a4b3cc39b4aea383e1739cf09eaff641e98b9f96b55c8debab8cb737e2a3',
         NETEASE_CLOUD_TOKEN_EXPIRE: 86400000
     });
 
@@ -546,7 +543,7 @@
     };
     
     const QUALITY_LEVELS = ['24bit', 'flac', '320k', '192k', '128k'];
-    const PLATFORMS = ['tx', 'wy', 'kw', 'kg', 'mg', 'sixyin', 'local', 'qorg', 'wycloud', 'wycloudmusic'];
+    const PLATFORMS = ['tx', 'wy', 'kw', 'kg', 'mg', 'sixyin', 'local', 'qorg', 'wycloud', 'wycloudmusic', 'qsvip'];
     
     const HTTP_REGEX = /^https?:\/\//i;
     const AUDIO_CONTENT_TYPES = ['audio/', 'application/octet-stream', 'binary/octet-stream'];
@@ -622,7 +619,7 @@
         activeRequests: new Map(),
         initialized: false,
         announcementSent: false,
-        neteaseCookie: '',
+        neteaseCookie: '_ntes_nnid=ca52af08faf87b9f2eda20485867f88c,1767836662172; _ntes_nuid=ca52af08faf87b9f2eda20485867f88c; NMTID=00OMSCK1Ll4WQxHF0wWh5E930LCDBQAAAGbm0a7Xw; WEVNSM=1.0.0; WNMCID=uikhjc.1767836663568.01.0; __snaker__id=Qn11uFiUM6vHvXay; WM_TID=NzeRyGqHxsxEFVUBRULD2sOaZDjj2Nzn; _iuqxldmzr_=32; MUSICIAN_COMPANY_LAST_ENTRY=1662683424_musician; ntes_utid=tid._.5Iyiv%252F3d%252BpZAU1QAURLD35bbZXsTD8Tz._.0.%2C.edd._.._.0; sDeviceId=YD-aZunqrfBN6BAAgFBABODnTCWg57Vcy2X; ntes_kaola_ad=1; NTES_P_UTID=0MNaXkD2b0n2gGWUC6lRzkkVfWzxpUap|1777625817; P_INFO=xcqm12@126.com|1777625817|1|phoenix_client|00&99|jis&1777560574&phoenix_client#jis&320600#10#0#0|&0|godlike_app&mbmail_android&ntesgod_app&mtoken_client&phoenix_client|xcqm12@126.com; __csrf=096f7a578ac9591d6c1f636b88b6a139; gdxidpyhxdE=E4Hr%2BNhJJ6bUP1EDbjGxJw7vCob71rQEaLkB2aDtXmm65wlZxjAC9ILDwXxHfGYcI%2B5PBd%2FVtUKQvt5queAJf4rL%2BHv8QOX1V5yrmAqWu1etpKKiHperc8RidsnEWbrD6XSURYYd%2BqNqw0a1SfBehkQIiyqOc5J5b7RcZy%5CkQ0X3hUJs%3A1782094060043; MUSIC_U=0053C8FF0D8F38CE69E31E98D55208A9D3F6247DBD447A3B380E49FF235988C34B371B7EAF66D752AEB992E765D87960D1B72E04AD1A4A09338E30ABBB057F3F794E9DED48B40D1E6D5A930ECC8A9FDEE76F19C74218A681B307249A014A0B807A95C312435B72111F76F44874EF6B91DEAEAF64E1CC28DB32549A6C6E4B06A89CC394341D7E9E4F468B3E0C835252BE9DF0B6EB2F2FAD72A5C6C8B799F781A478F45C8935F9C3445885F42F35C3BFFDC4993143A042717046042E54519F45F2C0B3274592D805000D8643115B2AA2F5A04CC90D278A589C866773CE26D1CBF042A2D10B7162BABE7BD27162B243FF1EAD3E493D438B108DD1D4592F5B0354E75CE628BFBBD1238C76C6707E90FAC74E0F853EB3D1FA8873DEDE0BF45C542DE156A25951E47AD466900D7D86F7B1099302A8CAEB4F8B6C9D1C64542A8946665C3FE8E95468DF9FE8BF32AF6FA5E269B4C47D8E946CC17F2C98BB063C048BB7F0D33FBF97E8CC7473CAFECF6EA641E150B53B637B9E8028ABD31DEB0FB3175ED976FF6C0A5E0EF0F5D288793FDDDDEADA5B6B3672B043CACB681C50FE3CCEA3232B; __csrf=c139c0f6418d18c1d566958db87cb4fc; JSESSIONID-WYYY=6TBY0CAs2lVul3wtkHITbyZzZlnD9ly9JsoxH7BPPFiPbkoq2fbqGetB%2FAV7nJI7Ox4Z%2FTGs%5CYct8B6a%2BXiCFthINrdVHsxuKFmV7Nn%2FiBzIJSH5Uu4o4X5jUOxy3w6sixGw4z6iCK4GmfBsJTXtKCN0a6cfBr6SIq2RyxmWhryvoVVO%3A1782213413307; WM_NI=sLFFobH41VKKv35bO7wb906suF9M7qnsR2jlbFxcyfGNaPCrjJixtQkLB3ayI4WDsNJf38JB%2FLiMGlGLVBazjql0wYMnwi7JUZXqEdCplRI3prmbbyX0RNwK%2BUQu6PO5ek4%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6eeaaf36d899f00b2f525fc9a8eb2c15f928e9bb0d221a2e7ffb6b134a29effafd02af0fea7c3b92ab1948aa7ee6a8cecffb7ca41b6edfb83ce3db5bef7d1b579b79af7aeb67baead9ed3e968a29ab884fc6e8592afb1c27aaa96a799f75ba9948ed4e4738bec99a5f2468abafdd9c94aed94a7aec66885949aa3e472aaafa4d1f6538fb2b98ab64297869892c87081b0a4b3cc39b4aea383e1739cf09eaff641e98b9f96b55c8debab8cb737e2a3',
         cleanupTimer: null,
         stats: {
             hits: 0,
@@ -648,7 +645,7 @@
 
     const platformNames = {
         tx: 'QQ音乐', wy: '网易云音乐', kw: '酷我音乐',
-        kg: '酷狗音乐', mg: '咪咕音乐', qishui: '汽水VIP',
+        kg: '酷狗音乐', mg: '咪咕音乐', qishui: '汽水VIP', qsvip: '汽水VIP',
         qorg: 'qorg音源', wycloud: '网易云盘', wycloudmusic: '自建网易云'
     };
 
@@ -1881,6 +1878,11 @@
             return feimaoGetUrl(platform, musicInfo, quality);
         }, 2, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
         
+        // 聚合API
+        new SourceHandler('聚合API', async (platform, musicInfo, quality) => {
+            return juheGetMusicUrl(platform, musicInfo);
+        }, 3, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
         // 小熊猫
         new SourceHandler('小熊猫', async (platform, musicInfo, quality) => {
             return xiaoxiongmaoGetUrl(platform, musicInfo, quality);
@@ -1932,6 +1934,11 @@
             return yecaoGetMusicUrl(musicInfo, quality);
         }, 11, { supportedPlatforms: ['kw'] }),
         
+        // 野花野草
+        new SourceHandler('野花野草', async (platform, musicInfo, quality) => {
+            return yehuayeGetMusicUrl(PLATFORM_TO_SOURCE[platform]?.main || platform, musicInfo, quality);
+        }, 13, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
         // fish
         new SourceHandler('fish', async (platform, musicInfo, quality) => {
             return fishGetMusicUrl(platform, musicInfo, quality);
@@ -1948,6 +1955,11 @@
             return wyqlmGetMusicUrl(musicInfo, quality);
         }, 13, { supportedPlatforms: ['wy'] }),
         
+        // Meting
+        new SourceHandler('Meting', async (platform, musicInfo, quality) => {
+            return metingGetMusicUrl(platform, musicInfo, quality);
+        }, 14, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
         // 网易云官方
         new SourceHandler('网易云官方', async (platform, musicInfo, quality) => {
             if (platform !== 'wy') throw new Error('仅限网易云');
@@ -1959,10 +1971,36 @@
             return xinghaiBackupGetUrl(platform, musicInfo, quality);
         }, 15, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
         
+        // 独家音源
+        new SourceHandler('独家音源', async (platform, musicInfo, quality) => {
+            return dusiyinyuanGetUrl(platform, musicInfo, quality);
+        }, 16, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
+        // 肥猫不肥
+        new SourceHandler('肥猫不肥', async (platform, musicInfo, quality) => {
+            return feimaobufeiGetMusicUrl(PLATFORM_TO_SOURCE[platform]?.main || platform, musicInfo, quality);
+        }, 17, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
+        // 梓澄qwq
+        new SourceHandler('梓澄qwq', async (platform, musicInfo, quality) => {
+            return zichengqwqGetMusicUrl(PLATFORM_TO_SOURCE[platform]?.main || platform, musicInfo, quality);
+        }, 18, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
+        // 梓澄公益2代
+        new SourceHandler('梓澄公益2代', async (platform, musicInfo, quality) => {
+            return zicheng2GetMusicUrl(PLATFORM_TO_SOURCE[platform]?.main || platform, musicInfo, quality);
+        }, 19, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
+        // Free listen
+        new SourceHandler('Free listen', async (platform, musicInfo, quality) => {
+            return freelistenGetMusicUrl(PLATFORM_TO_SOURCE[platform]?.main || platform, musicInfo, quality);
+        }, 20, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        
         // 汽水VIP
         new SourceHandler('汽水VIP', async (platform, musicInfo, quality) => {
+            if (platform !== 'qsvip') throw new Error('仅限汽水VIP');
             return qishuiGetUrl(musicInfo, quality);
-        }, 16, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] })
+        }, 21, { supportedPlatforms: ['qsvip'], timeout: 25000 })
     ];
 
     // ==================== 获取平台对应的处理器 ====================
