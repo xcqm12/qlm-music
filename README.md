@@ -100,7 +100,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0.js
 | 版本 | 状态 | 说明 | 推荐场景 |
 |-----|-----|-----|------|
 | **qlm-v1.0.1** | ⭐ **最新强烈推荐** | 重构优化版 1.0.1，基于 v7.0.7、v9.0.9 和 v7.1.2-ultimate-fix-v3.7 整合重构；qorg音源保留v9.0.9完整实现（九重回退机制）；所有音源优化重构；修复初始化失败问题（移除Node.js依赖，兼容浏览器环境）；修复lxmusic兼容性问题（改为自执行函数模式） | 所有用户 |
-| **qlm-v1.0.0** | ✅ 可用 | 重构版 1.0.0，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源，修复初始化失败、not a function 错误、缺失音源函数等问题 | 历史版本兼容 |
+| **qlm-v1.0.0** | ✅ 可用 | 重构版 1.0.0，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源；修复初始化失败、not a function 错误、缺失音源函数等问题；修复 qorg 无数据问题（对齐 9.0.9 HTTP 函数：添加 User-Agent、过滤空参数、重试机制） | 历史版本兼容 |
 | qlm-v9.0.0 | ✅ 可用 | 旗舰整合版，集成最新优化和增强功能 | 历史版本兼容 |
 | v7.1.2-ultimate-merged-v5.2-enhanced | ⭐ 推荐 | 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长[...] | 若不需要最新版本可继续使用 |
 | v7.1.2-ultimate-fix-v3.7 | ⭐ 推荐 | 终极修复版 v3.7，新增终极兜底跨平台回退，失败自动跳歌 | 若不需要新版整合特性可继续使用 |
@@ -320,7 +320,7 @@ graph TD
 | 版本 | 日期 | 更新内容 |
 |-----|------|---------|
 | **qlm-v1.0.1** | 2026 | 🎉 **重构优化版 1.0.1**，基于 v7.0.7、v9.0.9 和 v7.1.2-ultimate-fix-v3.7 整合重构；**qorg音源保留v9.0.9完整实现**（九重回退机制：`/song/url` → weapi → eapi → `/song/url/v1` → `/song/url/v1/302` → lossless → 多ID → 低音质降级 → `/music/url`；搜索补全ID；试听检测）；所有音源优化重构，支持独立运行和音源搜索；完善错误处理和日志记录；终极兜底跨平台切换（kg→kw→tx→wy）；添加 extractUrl/deepExtractUrl 智能URL提取；**修复初始化失败问题**（移除Node.js crypto依赖，使用纯JavaScript MD5实现，使用XMLHttpRequest替代fetch，兼容浏览器环境）；**修复lxmusic兼容性问题**（改为自执行函数模式，添加事件监听器机制，兼容lxmusic插件API） |
-| **qlm-v1.0.0** | 2026 | 🎉 **重构版 1.0.0**，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源；修复初始化失败问题；修复 not a function 错误；修复 Network request failed 问题；修复 星海备缺少歌曲ID 问题；**修复 qorg 音源完整版**（根据 api.qlm.org.cn 文档实现：9接口回退机制 `/song/url` → weapi → eapi → `/song/url/v1` → `/song/url/v1/302` → lossless → 多ID → 低音质降级 → `/music/url`；增加试听检测功能；增加搜索补全ID功能；增加网易云加密工具 weapi/eapi）；添加缺失的音源处理函数（肥猫不肥、梓澄qwq、梓澄公益2代、聚合API、野花野草、Meting、Free listen、独家音源）；添加 PLATFORM_TO_SOURCE 配置；添加 httpFetch 工具函数；**修复汽水VIP配置**（将平台限制改为 `qsvip`，添加平台检查，增加超时配置）；添加缺失配置 `QISHUI_API_HTTP` 和 `QISHUI_PROXY_API`；添加 `qsvip` 平台支持；**添加终极兜底机制**（跨平台切换：kg→kw→tx→wy，搜索补全ID，URL可达性验证，试听检测）；添加 `extractUrl` 和 `deepExtractUrl` 工具函数 |
+| **qlm-v1.0.0** | 2026 | 🎉 **重构版 1.0.0**，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源；修复初始化失败问题；修复 not a function 错误；修复 Network request failed 问题；修复 星海备缺少歌曲ID 问题；**修复 qorg 音源完整版**（根据 api.qlm.org.cn 文档实现：9接口回退机制 `/song/url` → weapi → eapi → `/song/url/v1` → `/song/url/v1/302` → lossless → 多ID → 低音质降级 → `/music/url`；增加试听检测功能；增加搜索补全ID功能；增加网易云加密工具 weapi/eapi）；**修复 qorg 无数据问题**（对齐 9.0.9 HTTP 函数：`httpGet`/`httpGetRedirect` 添加 User-Agent 请求头、过滤空参数、集成 `httpRequestWithRetry` 重试机制；`httpFetch` 替换为 9.0.9 版本；`qorgSearch` 移除 try-catch 让错误正常传播）；添加缺失的音源处理函数（肥猫不肥、梓澄qwq、梓澄公益2代、聚合API、野花野草、Meting、Free listen、独家音源）；添加 PLATFORM_TO_SOURCE 配置；添加 httpFetch 工具函数；**修复汽水VIP配置**（将平台限制改为 `qsvip`，添加平台检查，增加超时配置）；添加缺失配置 `QISHUI_API_HTTP` 和 `QISHUI_PROXY_API`；添加 `qsvip` 平台支持；**添加终极兜底机制**（跨平台切换：kg→kw→tx→wy，搜索补全ID，URL可达性验证，试听检测）；添加 `extractUrl` 和 `deepExtractUrl` 工具函数 |
 | qlm-v9.0.0 | 2026 | 🎉 旗舰整合版，集成最新增强优化 |
 | v7.1.2-ultimate-merged-v5.2-enhanced | 2026 | 🏆 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长[...] |
 | v7.1.2-ultimate-fix-v3.7 | 2026 | 🏆 终极修复版 v3.7，新增终极兜底机制：所有常规音源失败后自动调用 api.qlm.org.cn 跨平台（kg→kw→tx→wy）回退获取链接，[...] |
