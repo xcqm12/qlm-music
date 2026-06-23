@@ -440,41 +440,25 @@
     }
 
     // ==================== HTTP 工具函数 ====================
-    function httpGet(url, params, timeout, headers) {
-        return new Promise((resolve, reject) => {
-            const query = params ? Object.entries(params).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&') : '';
-            const fullUrl = query ? `${url}?${query}` : url;
-            const options = { method: 'GET', timeout: timeout || CONFIG.REQUEST_TIMEOUT };
-            if (headers) options.headers = headers;
-            request(fullUrl, options, (err, res) => {
-                if (err) return reject(err);
-                try {
-                    const body = res.body;
-                    if (typeof body === 'string') {
-                        try { resolve(JSON.parse(body)); } catch (e) { resolve(body); }
-                    } else { resolve(body); }
-                } catch (e) { reject(e); }
-            });
-        });
+    async function httpGet(url, params, timeout, extraHeaders={}) {
+        const qs = Object.entries(params||{}).filter(([,v])=>v!=null&&v!=='').map(([k,v])=>`${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+        const full = url + (qs ? (url.includes('?')?'&':'?') + qs : '');
+        return (await httpRequestWithRetry(full, {method:'GET', timeout, headers:{'User-Agent':`lx-music-${env}/${version}`,...extraHeaders}})).body;
     }
 
-    function httpGetRedirect(url, params, timeout) {
-        return new Promise((resolve, reject) => {
-            const query = params ? Object.entries(params).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&') : '';
-            const fullUrl = query ? `${url}?${query}` : url;
-            const options = { method: 'GET', timeout: timeout || CONFIG.REQUEST_TIMEOUT, followRedirect: false };
-            request(fullUrl, options, (err, res) => {
-                if (err) return reject(err);
-                try {
-                    const location = res.headers && (res.headers.location || res.headers.Location);
-                    if (location) return resolve(location);
-                    if (res.statusCode >= 300 && res.statusCode < 400) {
-                        return resolve(res.headers?.location || res.headers?.Location || null);
-                    }
-                    resolve(res.body);
-                } catch (e) { reject(e); }
-            });
-        });
+    async function httpGetRedirect(url, params, timeout, extraHeaders={}) {
+        const qs = Object.entries(params||{}).filter(([,v])=>v!=null&&v!=='').map(([k,v])=>`${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+        const full = url + (qs ? (url.includes('?')?'&':'?') + qs : '');
+        try {
+            const resp = await httpFetch(full, {method:'GET', timeout, headers:{'User-Agent':`lx-music-${env}/${version}`,...extraHeaders}, follow_max: 0});
+            if (resp.statusCode === 302 || resp.statusCode === 301) {
+                const location = resp.headers && (resp.headers.location || resp.headers.Location);
+                if (location) return location;
+            }
+            return (await httpRequestWithRetry(full, {method:'GET', timeout, headers:{'User-Agent':`lx-music-${env}/${version}`,...extraHeaders}})).body;
+        } catch (e) {
+            throw new Error(`httpGetRedirect失败: ${e.message}`);
+        }
     }
 
     function httpPost(url, data, timeout, headers) {
@@ -497,20 +481,37 @@
         });
     }
 
-    function httpFetch(url, options) {
+    const httpFetch = function(url, options) {
+        if (!url || !SafeUtils.isString(url)) return Promise.reject(new Error('Invalid URL'));
         return new Promise((resolve, reject) => {
-            const opts = Object.assign({ method: 'GET', timeout: CONFIG.REQUEST_TIMEOUT }, options || {});
-            request(url, opts, (err, res) => {
-                if (err) return reject(err);
-                try {
-                    const body = res.body;
-                    if (typeof body === 'string') {
-                        try { resolve({ body: JSON.parse(body), statusCode: res.statusCode }); }
-                        catch (e) { resolve({ body: body, statusCode: res.statusCode }); }
-                    } else { resolve({ body: body, statusCode: res.statusCode }); }
-                } catch (e) { reject(e); }
-            });
+            const t = setTimeout(() => reject(new Error('请求超时: '+url.slice(0,50))), (options&&options.timeout)||CONFIG.REQUEST_TIMEOUT);
+            try {
+                request(url, options, (err, resp) => {
+                    clearTimeout(t);
+                    if (err) return reject(new Error('网络请求失败: '+(err.message||err)));
+                    resolve(resp||{});
+                });
+            } catch(e) { clearTimeout(t); reject(e); }
         });
+    };
+
+    function delay(ms) { return new Promise(r => setTimeout(r, ms || 100)); }
+
+    async function httpRequestWithRetry(url, options, retries=0) {
+        let lastErr;
+        for (let i=0; i<=retries; i++) {
+            try {
+                if (i>0) await delay(CONFIG.RETRY_DELAY*i);
+                const resp = await httpFetch(url, options);
+                let body = resp.body;
+                if (SafeUtils.isString(body)) {
+                    const s = body.trim();
+                    if (s.startsWith('{')||s.startsWith('[')) try { body = JSON.parse(s); } catch(e){}
+                }
+                return { statusCode: resp.statusCode||0, headers: resp.headers||{}, body };
+            } catch(e) { lastErr = e; }
+        }
+        throw lastErr || new Error('所有重试均失败');
     }
 
     function withTimeout(promise, ms, errorMsg) {
@@ -949,31 +950,27 @@
         const cacheKey = `qorg_search_${keyword}_${page}`;
         const cached = state.searchCache.get(cacheKey);
         if (cached) return cached;
-        try {
-            const res = await httpGet(CONFIG.QORG_API_URL + '/search', { keywords: keyword, limit: pageSize }, 15000);
-            let list = [];
-            if (Array.isArray(res)) list = res;
-            else if (res && res.data) list = Array.isArray(res.data) ? res.data : (res.data.list || res.data.songs || []);
-            const total = res?.data?.total || list.length;
-            if (list.length > 0) {
-                const result = {
-                    isEnd: list.length < pageSize,
-                    list: list.map((item, index) => ({
-                        id: String(item.id || ''), songmid: item.id || item.songmid,
-                        name: item.name || item.title || '未知歌曲',
-                        singer: item.singer || item.artist || '',
-                        albumName: item.album || item.albumname || '',
-                        duration: item.duration ? Math.floor(parseInt(item.duration) * 1000) : null,
-                        pic: item.pic || item.cover || '',
-                        _source: 'qorg'
-                    })),
-                    total, page, limit: pageSize
-                };
-                state.searchCache.set(cacheKey, result);
-                return result;
-            }
-        } catch (e) {
-            console.warn('[qorgSearch] 搜索失败:', e.message);
+        const res = await httpGet(CONFIG.QORG_API_URL + '/search', { keywords: keyword, limit: pageSize }, 15000);
+        let list = [];
+        if (Array.isArray(res)) list = res;
+        else if (res && res.data) list = Array.isArray(res.data) ? res.data : (res.data.list || res.data.songs || []);
+        const total = res?.data?.total || list.length;
+        if (list.length > 0) {
+            const result = {
+                isEnd: list.length < pageSize,
+                list: list.map((item, index) => ({
+                    id: String(item.id || ''), songmid: item.id || item.songmid,
+                    name: item.name || item.title || '未知歌曲',
+                    singer: item.singer || item.artist || '',
+                    albumName: item.album || item.albumname || '',
+                    duration: item.duration ? Math.floor(parseInt(item.duration) * 1000) : null,
+                    pic: item.pic || item.cover || '',
+                    _source: 'qorg'
+                })),
+                total, page, limit: pageSize
+            };
+            state.searchCache.set(cacheKey, result);
+            return result;
         }
         return { isEnd: true, list: [], total: 0, page, limit: pageSize };
     }
