@@ -855,6 +855,138 @@
         return trialPatterns.some(pattern => pattern.test(url));
     }
 
+    // ==================== 试听检测函数 ====================
+    function hasFreeTrialFlag(resp) {
+        if (!resp || typeof resp !== 'object') return false;
+        if (resp.freeTrialInfo !== undefined) return true;
+        if (resp.data && Array.isArray(resp.data)) {
+            for (const item of resp.data) {
+                if (item && item.freeTrialInfo) return true;
+            }
+        }
+        if (resp.data && typeof resp.data === 'object' && resp.data.freeTrialInfo) return true;
+        return false;
+    }
+
+    async function isTrialUrlBySize(url, timeout = 5000) {
+        if (!url || !HTTP_REGEX.test(url)) return true;
+        try {
+            const resp = await withTimeout(
+                httpFetch(url, {
+                    method: 'HEAD',
+                    timeout: timeout,
+                    headers: { 'User-Agent': `lx-music-${env}/${version}` },
+                    follow_max: 2
+                }),
+                timeout,
+                '试听检测超时'
+            );
+            const contentLength = resp.headers && (resp.headers['content-length'] || resp.headers['Content-Length']);
+            if (contentLength) {
+                const size = parseInt(contentLength, 10);
+                if (!isNaN(size) && size < 1024 * 1024) {
+                    console.warn(`[试听检测] 文件过小 (${size} bytes)，判定为试听片段: ${url}`);
+                    return true;
+                }
+            }
+            const contentType = resp.headers && (resp.headers['content-type'] || resp.headers['Content-Type']);
+            if (contentType && !/audio|mpeg|octet-stream|mp3|m4a|flac|wav|ogg/i.test(contentType)) {
+                console.warn(`[试听检测] Content-Type 异常 (${contentType})，判定为无效: ${url}`);
+                return true;
+            }
+            return false;
+        } catch (e) {
+            console.warn(`[试听检测] HEAD 请求失败: ${e.message}`);
+            return false;
+        }
+    }
+
+    async function isTrialSong(resp, url) {
+        if (hasFreeTrialFlag(resp)) return true;
+        if (url && url.includes('/ymusic/')) {
+            console.warn(`[试听检测] URL 包含 /ymusic/ 特征，判定为试听: ${url}`);
+            return true;
+        }
+        if (url) {
+            const sizeCheck = await isTrialUrlBySize(url);
+            if (sizeCheck) return true;
+        }
+        return false;
+    }
+
+    // ==================== 网易云加密工具 ====================
+    function freelistenWyWeapi(object) {
+        const text = JSON.stringify(object);
+        const key1 = '0CoJUm6Qyw8W8jud';
+        const key2 = 'a8LWv2uAtXjzSfkQ';
+        const iv = '0102030405060708';
+        const encSecKey = '257348aecb5e556c066de214e531faadd1c55d814f9be95fd06d6bff9f4c7a41f831f6394d5a3fd2e3881736d94a02ca919d952872e7ce0a50eb844be3c20a9f5aa5e1d4da57616f4a3f1c3ff1ef93f77c2b27e6a2a6b02c7b96f2b2e6e6f788d8f103ab93aa2e3006db3b0c1b93bc371af9f2f47b1e82f8d5597b3c4fe6b57';
+        if (utils && utils.crypto && typeof utils.crypto.aesEncrypt === 'function' && utils.buffer) {
+            try {
+                const cipher1 = utils.crypto.aesEncrypt(text, 'aes-128-cbc', key1, iv);
+                const b64_1 = utils.buffer.bufToString(cipher1, 'base64');
+                const cipher2 = utils.crypto.aesEncrypt(b64_1, 'aes-128-cbc', key2, iv);
+                const b64_2 = utils.buffer.bufToString(cipher2, 'base64');
+                return { params: b64_2, encSecKey: encSecKey };
+            } catch(e) { console.warn('[weapi] 加密失败:', e.message); }
+        }
+        return null;
+    }
+
+    function freelistenWyEapi(url, object) {
+        const eapiKey = 'e82ckenh8dichen8';
+        const text = typeof object === 'object' ? JSON.stringify(object) : object;
+        const message = `nobody${url}use${text}md5forencrypt`;
+        const digest = md5(message);
+        const data = `${url}-36cd479b6b5-${text}-36cd479b6b5-${digest}`;
+        if (utils && utils.crypto && typeof utils.crypto.aesEncrypt === 'function' && utils.buffer) {
+            try {
+                const encrypted = utils.crypto.aesEncrypt(data, 'aes-128-ecb', eapiKey, '');
+                if (utils.buffer && typeof utils.buffer.bufToString === 'function') {
+                    return { params: utils.buffer.bufToString(encrypted, 'hex').toUpperCase() };
+                }
+            } catch(e) { console.warn('[freelistenWyEapi] 加密失败:', e.message); }
+        }
+        let result = '';
+        for (let i = 0; i < data.length; i++) {
+            result += ('0' + data.charCodeAt(i).toString(16)).slice(-2);
+        }
+        return { params: result.toUpperCase() };
+    }
+
+    async function freelistenWyWeapiRequest(data) {
+        const enc = freelistenWyWeapi(data);
+        if (!enc) return null;
+        const weapiUrl = 'https://interface3.music.163.com/weapi/song/enhance/player/url';
+        let cookie = 'os=pc';
+        if (CONFIG.NETEASE_CLOUD_COOKIE_KEY) cookie = CONFIG.NETEASE_CLOUD_COOKIE_KEY + '; ' + cookie;
+        const resp = await httpFetch(weapiUrl, {
+            method: 'POST',
+            form: enc,
+            headers: { cookie }
+        });
+        const body = resp.body;
+        if (body?.code === 200 && body.data?.[0]?.url && !body.data[0].freeTrialInfo) {
+            return validateUrl(body.data[0].url, 'Free listen 网易云 (weapi)');
+        }
+        throw new Error(body?.message || 'weapi 获取失败');
+    }
+
+    async function httpGetRedirect(url, params, timeout, extraHeaders={}) {
+        const qs = Object.entries(params||{}).filter(([,v])=>v!=null&&v!=='').map(([k,v])=>`${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&');
+        const full = url + (qs ? (url.includes('?')?'&':'?') + qs : '');
+        try {
+            const resp = await httpFetch(full, {method:'GET', timeout, headers:{'User-Agent':`lx-music-${env}/${version}`,...extraHeaders}, follow_max: 0});
+            if (resp.statusCode === 302 || resp.statusCode === 301) {
+                const location = resp.headers && (resp.headers.location || resp.headers.Location);
+                if (location) return location;
+            }
+            return (await httpRequestWithRetry(full, {method:'GET', timeout, headers:{'User-Agent':`lx-music-${env}/${version}`,...extraHeaders}})).body;
+        } catch (e) {
+            throw new Error(`httpGetRedirect失败: ${e.message}`);
+        }
+    }
+
     // ==================== 音源获取函数 ====================
     
     // GD音乐台
@@ -1102,7 +1234,7 @@
         throw new Error('fish获取失败');
     }
     
-    // qorg
+    // ==================== qorg 获取播放地址（修复试听检测） ====================
     async function qorgGetMusicUrl(platform, songInfo, quality) {
         if (platform !== 'wy' && platform !== 'wycloudmusic') {
             throw new Error(`qorg: 不支持平台 ${platform}，仅支持 wy/wycloudmusic`);
@@ -1152,19 +1284,142 @@
             throw new Error('qorg: 无效的歌曲ID');
         }
 
-        const sourceMap = { wy: 'netease', wycloudmusic: 'netease' };
-        const source = sourceMap[platform] || 'netease';
-        
-        const res = await httpPost(`${CONFIG.QORG_API_URL}/music/url`, {
-            platform: source,
-            id: sid,
-            quality: quality || '320k'
-        }, CONFIG.REQUEST_TIMEOUT);
-        
-        if (res && res.code === 200 && res.data && res.data.url) {
-            return res.data.url;
+        const brMap = { '128k': 128000, '192k': 192000, '320k': 320000, 'flac': 999000, 'flac24bit': 999000, 'hires': 999000, 'Hi-Res': 999000, 'jymaster': 999000, 'jyeffect': 999000, 'sky': 999000, 'dolby': 999000 };
+        const br = brMap[quality] || 320000;
+        const levelMap = { '128k': 'standard', '192k': 'higher', '320k': 'exhigh', 'flac': 'lossless', 'flac24bit': 'lossless', 'hires': 'hires', 'Hi-Res': 'Hi-Res', 'jyeffect': 'jyeffect', 'sky': 'sky', 'dolby': 'dolby', 'jymaster': 'jymaster' };
+        const level = levelMap[quality] || 'exhigh';
+
+        // 尝试不加密接口 /song/url
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url?id=${sid}&br=${br}`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (res?.code === 200 && Array.isArray(res.data) && res.data[0]?.url) {
+                const trial = await isTrialSong(res.data[0], res.data[0].url);
+                if (!trial) return validateUrl(res.data[0].url, 'qorg');
+                else throw new Error('试听歌曲（不加密）');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[qorg] 不加密接口失败:', e.message, '→ 尝试 weapi');
         }
-        throw new Error('qorg获取失败');
+
+        // 尝试 weapi
+        try {
+            const d = { ids: `[${sid}]`, br: br };
+            const url = await freelistenWyWeapiRequest(d);
+            if (url) {
+                const trial = await isTrialSong({}, url);
+                if (!trial) return validateUrl(url, 'qorg (weapi)');
+                else throw new Error('试听歌曲（weapi）');
+            }
+        } catch (e) {
+            console.warn('[qorg] weapi 失败:', e.message, '→ 尝试 eapi');
+        }
+
+        // 尝试 eapi
+        try {
+            const d = { ids: `[${sid}]`, br: br };
+            const eapiUrl = '/api/song/enhance/player/url';
+            const eapiData = freelistenWyEapi(eapiUrl, d);
+            let cookie = 'os=pc';
+            if (CONFIG.NETEASE_CLOUD_COOKIE_KEY) cookie = CONFIG.NETEASE_CLOUD_COOKIE_KEY + '; ' + cookie;
+            const targetUrl = 'https://interface3.music.163.com/eapi/song/enhance/player/url';
+            const resp = await httpFetch(targetUrl, {
+                method: 'POST',
+                form: eapiData,
+                headers: { cookie }
+            });
+            const resData = resp.body;
+            if (!resData?.data || !resData.data[0]) {
+                throw new Error('eapi返回数据格式异常');
+            }
+            const { url, freeTrialInfo } = resData.data[0];
+            if (url && !freeTrialInfo) {
+                const trial = await isTrialSong(resData.data[0], url);
+                if (!trial) return validateUrl(url, 'qorg (eapi)');
+                else throw new Error('试听歌曲（eapi）');
+            }
+            throw new Error(resData?.message || freeTrialInfo ? '试听歌曲' : '无URL');
+        } catch (e) {
+            console.warn('[qorg] eapi 失败:', e.message, '→ 尝试 /song/url/v1');
+        }
+
+        // 尝试 v1 接口
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${sid}&level=${level}`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            let v1Url = null;
+            if (res?.code === 200) {
+                if (res.data?.url) {
+                    v1Url = res.data.url;
+                } else if (Array.isArray(res.data) && res.data[0]?.url) {
+                    v1Url = res.data[0].url;
+                }
+            }
+            if (v1Url) {
+                const trial = await isTrialSong(res.data, v1Url);
+                if (!trial) return validateUrl(v1Url, 'qorg (v1)');
+                else throw new Error('试听歌曲（v1）');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[qorg] /song/url/v1 失败:', e.message, '→ 尝试 /song/url/v1/302');
+        }
+
+        // 尝试 302 跳转接口
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1/302?id=${sid}`;
+            const redirectUrl = await httpGetRedirect(url, {}, CONFIG.REQUEST_TIMEOUT);
+            if (redirectUrl && redirectUrl.startsWith('http')) {
+                const trial = await isTrialSong({}, redirectUrl);
+                if (!trial) return validateUrl(redirectUrl, 'qorg (v1/302)');
+                else throw new Error('试听歌曲（302）');
+            }
+            throw new Error('302跳转无有效URL');
+        } catch (e) {
+            console.warn('[qorg] /song/url/v1/302 失败:', e.message, '→ 尝试 /song/url/v1 (lossless多ID)');
+        }
+
+        // 尝试 lossless 接口
+        try {
+            const url = `${CONFIG.QORG_API_URL}/song/url/v1?id=${sid}&level=lossless`;
+            const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+            let losslessUrl = null;
+            if (res?.code === 200) {
+                if (res.data?.url) {
+                    losslessUrl = res.data.url;
+                } else if (Array.isArray(res.data) && res.data[0]?.url) {
+                    losslessUrl = res.data[0].url;
+                }
+            }
+            if (losslessUrl) {
+                const trial = await isTrialSong(res.data, losslessUrl);
+                if (!trial) return validateUrl(losslessUrl, 'qorg (lossless)');
+                else throw new Error('试听歌曲（lossless）');
+            }
+            throw new Error(res?.msg || res?.message || '无数据');
+        } catch (e) {
+            console.warn('[qorg] lossless 失败:', e.message, '→ 尝试 /music/url');
+        }
+
+        // 尝试旧接口 /music/url
+        try {
+            const res = await httpPost(`${CONFIG.QORG_API_URL}/music/url`, {
+                platform: 'netease',
+                id: sid,
+                quality: quality || '320k'
+            }, CONFIG.REQUEST_TIMEOUT);
+            if (res && res.code === 200 && res.data && res.data.url) {
+                const trial = await isTrialSong(res.data, res.data.url);
+                if (!trial) return validateUrl(res.data.url, 'qorg (music/url)');
+                else throw new Error('试听歌曲（music/url）');
+            }
+            throw new Error('music/url 无数据');
+        } catch (e) {
+            console.warn('[qorg] /music/url 失败:', e.message);
+        }
+
+        throw new Error('qorg: 所有接口均失败');
     }
     
     // ==================== qorg 搜索函数 ====================
