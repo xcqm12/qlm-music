@@ -177,7 +177,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0-integrated.js
 
 📊 技术架构
 
-
+```mermaid
 graph TD
     A[洛雪音乐] --> B[事件监听器]
     B --> C{请求类型}
@@ -207,6 +207,7 @@ graph TD
     S -->|是| Q
     S -->|否| T[返回空 → LX自动跳歌]
     Q --> U[返回有效URL]
+```
 
 
 ---
