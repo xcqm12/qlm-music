@@ -65,7 +65,7 @@
 3. 选择「**自定义源**」或「**导入源**」
 4. 填入以下任一链接：
 
-```bash
+
 # GitHub 原始链接（国内可能需要代理）
 https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v1.0.0-integrated.js
 
@@ -177,7 +177,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0-integrated.js
 
 📊 技术架构
 
-```mermaid
+
 graph TD
     A[洛雪音乐] --> B[事件监听器]
     B --> C{请求类型}
@@ -207,7 +207,7 @@ graph TD
     S -->|是| Q
     S -->|否| T[返回空 → LX自动跳歌]
     Q --> U[返回有效URL]
-```
+
 
 ---
 
