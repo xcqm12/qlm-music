@@ -1,6 +1,6 @@
 # 🎵 七零喵聚合音源 · 超级整合版
 
-![version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![version](https://img.shields.io/badge/version-1.0.0-integrated-blue.svg)
 ![license](https://img.shields.io/badge/license-学习交流-green.svg)
 ![platform](https://img.shields.io/badge/平台-洛雪音乐-orange.svg)
 ![stars](https://img.shields.io/github/stars/xcqm12/qlm-music?style=social)
@@ -67,11 +67,10 @@
 
 ```bash
 # GitHub 原始链接（国内可能需要代理）
-https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v1.0.0.js
+https://raw.githubusercontent.com/xcqm12/qlm-music/main/qlm-v1.0.0-integrated.js
 
 # 备用链接（CDN，推荐）
-https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0.js
-```
+https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0-integrated.js
 
 💡 提示：使用在线导入方式，每次重启洛雪音乐时会自动检查更新。
 若需使用其他修复版本，可替换为对应文件名。
