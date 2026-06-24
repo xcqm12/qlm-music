@@ -1,6 +1,6 @@
 # 🎵 七零喵聚合音源 · 超级整合版
 
-![version](https://img.shields.io/badge/version-1.0.0-integrated-blue.svg)
+![version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![license](https://img.shields.io/badge/license-学习交流-green.svg)
 ![platform](https://img.shields.io/badge/平台-洛雪音乐-orange.svg)
 ![stars](https://img.shields.io/github/stars/xcqm12/qlm-music?style=social)
