@@ -78,7 +78,7 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0-integrated.js
 方式二：本地文件导入
 
 1. 从本仓库下载推荐版本文件：
-   · ⭐ qlm-v1.0.0.js（最新版本，强烈推荐）
+   · ⭐ qlm-v1.0.0-integrated.js（最新版本，强烈推荐）
    · …（更多历史版本见文件列表）
 2. 在洛雪音乐中选择「本地文件」方式导入
 3. 浏览并选择下载的 .js 文件即可
