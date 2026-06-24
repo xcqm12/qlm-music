@@ -1,7 +1,7 @@
 /**
- * @name 七零喵聚合音源 · 终极整合版 v1.0.0
+ * @name 七零喵聚合音源 · 终极整合版 v1.0.2
  * @description 整合 7.0.7 + 9.0.9 + v7.1.2-ultimate-fix-v3.7 所有优点
- * @version 1.0.0
+ * @version 1.0.3
  * @features 全音源独立并发 | qorg完整回退链 | 试听检测 | 智能缓存 | 成功即停 | 终极兜底
  * @author 七零喵团队
  * @homepage https://github.com/xcqm12/qlm-music
@@ -48,6 +48,56 @@
         };
     }
 
+    // ==================== URLSearchParams Polyfill ====================
+    if (typeof URLSearchParams !== 'function') {
+        globalThis.URLSearchParams = function(init) {
+            this._params = {};
+            if (typeof init === 'string') {
+                const pairs = init.split('&');
+                for (const pair of pairs) {
+                    const [key, value] = pair.split('=').map(decodeURIComponent);
+                    if (key) this.append(key, value);
+                }
+            } else if (init && typeof init === 'object') {
+                for (const key in init) {
+                    if (init.hasOwnProperty(key)) {
+                        this.append(key, init[key]);
+                    }
+                }
+            }
+        };
+        globalThis.URLSearchParams.prototype.append = function(key, value) {
+            if (!this._params[key]) this._params[key] = [];
+            this._params[key].push(String(value));
+        };
+        globalThis.URLSearchParams.prototype.set = function(key, value) {
+            this._params[key] = [String(value)];
+        };
+        globalThis.URLSearchParams.prototype.get = function(key) {
+            return this._params[key] ? this._params[key][0] : null;
+        };
+        globalThis.URLSearchParams.prototype.getAll = function(key) {
+            return this._params[key] || [];
+        };
+        globalThis.URLSearchParams.prototype.has = function(key) {
+            return key in this._params;
+        };
+        globalThis.URLSearchParams.prototype.delete = function(key) {
+            delete this._params[key];
+        };
+        globalThis.URLSearchParams.prototype.toString = function() {
+            const pairs = [];
+            for (const key in this._params) {
+                if (this._params.hasOwnProperty(key)) {
+                    for (const value of this._params[key]) {
+                        pairs.push(encodeURIComponent(key) + '=' + encodeURIComponent(value));
+                    }
+                }
+            }
+            return pairs.join('&');
+        };
+    }
+
     // ==================== 安全获取全局对象 ====================
     const globalObj = (function() {
         try { if (typeof globalThis !== 'undefined') return globalThis; } catch (e) {}
@@ -60,13 +110,16 @@
 
     // ==================== 公告信息 ====================
     const ANNOUNCEMENT = Object.freeze({
-        title: "七零喵聚合音源 · 终极整合版 v1.0.0",
+        title: "七零喵聚合音源 · 终极整合版 v1.0.2",
         content: "整合 7.0.7 + 9.0.9 + v7.1.2-ultimate-fix-v3.7\n" +
-                 "音源: GD音乐台/CHKSZ/肥猫/小熊猫/梓澄公益/無名/六音/星海主/星海备/长青SVIP/念心SVIP/溯音/ikun/野草/fish/qorg/wyqlm/网易云官方/汽水VIP\n" +
+                 "音源: 聚合API/GD音乐台/CHKSZ/肥猫/小熊猫/梓澄公益/無名/六音/星海主/星海备/长青SVIP/念心SVIP/溯音/ikun/野草/fish/qorg/wyqlm/网易云官方/汽水VIP\n" +
                  "特性: 全音源独立并发 | 成功即停 | 智能缓存 | qorg完整回退链 | 试听检测\n" +
                  "eapi/weapi/raw加密 | 终极兜底 | 失败自动跳歌\n" +
+                 "修复v1.0.2: URLSearchParams Polyfill | 聚合API | 音源参数传递修正\n" +
+                 "  - 汽水VIP: 修正为noPlatform模式(只传songInfo,quality)\n" +
+                 "  - ikun/肥猫/梓澄/無名: 修正为requireSource模式\n" +
                  "2026 七零喵团队",
-        version: "1.0.0"
+        version: "1.0.2"
     });
 
     // ==================== 修复事件名称兼容性 ====================
@@ -150,6 +203,9 @@
         // qorg/wyqlm API
         QORG_API_URL: "https://api.qlm.org.cn",
         WYQLM_API_URL: "https://api.qlm.org.cn",
+
+        // 聚合API (来自 7.0.7)
+        JUHE_API_URL: "https://api.music.lerd.dpdns.org",
 
         // ikun API
         IKUN_API_URL: "https://api.ikunshare.com",
@@ -461,24 +517,24 @@
         }
     }
 
-    function httpPost(url, data, timeout, headers) {
-        return new Promise((resolve, reject) => {
-            const options = {
-                method: 'POST',
-                body: typeof data === 'string' ? data : JSON.stringify(data),
-                timeout: timeout || CONFIG.REQUEST_TIMEOUT,
-                headers: Object.assign({ 'Content-Type': 'application/json' }, headers || {})
-            };
-            request(url, options, (err, res) => {
-                if (err) return reject(err);
-                try {
-                    const body = res.body;
-                    if (typeof body === 'string') {
-                        try { resolve(JSON.parse(body)); } catch (e) { resolve(body); }
-                    } else { resolve(body); }
-                } catch (e) { reject(e); }
-            });
-        });
+    async function httpPost(url, body, timeout, extraHeaders={}) {
+        return (await httpRequestWithRetry(url, {
+            method:'POST',
+            headers:{'Content-Type':'application/json', 'User-Agent': `lx-music-${env}/${version}`, ...extraHeaders},
+            body: SafeUtils.isString(body) ? body : JSON.stringify(body||{}),
+            timeout
+        })).body;
+    }
+
+    async function httpPostForm(url, formData, timeout, extraHeaders={}) {
+        const form = new URLSearchParams();
+        Object.entries(formData || {}).forEach(([k, v]) => form.append(k, v));
+        return (await httpRequestWithRetry(url, {
+            method:'POST',
+            headers:{'Content-Type':'application/x-www-form-urlencoded', 'User-Agent': `lx-music-${env}/${version}`, ...extraHeaders},
+            body: form.toString(),
+            timeout
+        })).body;
     }
 
     const httpFetch = function(url, options) {
@@ -522,14 +578,32 @@
     }
 
     // ==================== URL 提取与验证工具 ====================
+    function normalizeUrl(url) {
+        if (!url && url !== 0) return null;
+        let value = String(url).trim();
+        if (value.startsWith('//')) value = 'https:' + value;
+        return value;
+    }
+
     function extractUrl(data, source) {
         if (!data) return null;
-        if (typeof data === 'string' && HTTP_REGEX.test(data)) return data;
+        if (typeof data === 'string') {
+            const normalized = normalizeUrl(data);
+            return normalized && HTTP_REGEX.test(normalized) ? normalized : null;
+        }
+        if (Array.isArray(data)) {
+            for (const item of data) {
+                const url = extractUrl(item, source);
+                if (url) return url;
+            }
+            return null;
+        }
         if (typeof data === 'object') {
-            const fields = ['url', 'music_url', 'play_url', 'source_url', 'download_url', 'data', 'result', 'music', 'src'];
+            const fields = ['url', 'music_url', 'play_url', 'source_url', 'download_url', 'data', 'result', 'music', 'src', 'link', 'audio', 'mp3'];
             for (const field of fields) {
-                if (data[field] && typeof data[field] === 'string' && HTTP_REGEX.test(data[field])) {
-                    return data[field];
+                if (data[field]) {
+                    const url = extractUrl(data[field], source);
+                    if (url) return url;
                 }
             }
         }
@@ -537,9 +611,10 @@
     }
 
     function validateUrl(url, source) {
-        if (!url || typeof url !== 'string') throw new Error(`${source}: 无效URL`);
-        if (!HTTP_REGEX.test(url)) throw new Error(`${source}: URL格式错误`);
-        return url;
+        const normalized = normalizeUrl(url);
+        if (!normalized) throw new Error(`${source}: 无效URL`);
+        if (!HTTP_REGEX.test(normalized)) throw new Error(`${source}: URL格式错误`);
+        return normalized;
     }
 
     async function validateAudioUrl(url, timeout) {
@@ -665,10 +740,203 @@
             return result;
         },
         createCipher: function(algorithm, key, iv) {
+            const keyBytes = this.stringToBytes(key);
+            const ivBytes = iv ? this.stringToBytes(iv) : null;
+            const isECB = !iv || algorithm.toLowerCase().includes('ecb');
+            
             return {
-                update: (data, inputEncoding, outputEncoding) => data,
-                final: (outputEncoding) => ''
+                update: (data, inputEncoding, outputEncoding) => {
+                    const dataBytes = inputEncoding === 'utf8' ? this.stringToBytes(data) : this.base64ToBytes(data);
+                    const padded = this.padPKCS7(dataBytes, 16);
+                    const encrypted = isECB 
+                        ? this.aesEcbEncrypt(padded, keyBytes) 
+                        : this.aesCbcEncrypt(padded, keyBytes, ivBytes);
+                    return outputEncoding === 'base64' ? this.bytesToBase64(encrypted) : encrypted;
+                },
+                final: (outputEncoding) => {
+                    return '';
+                }
             };
+        },
+        stringToBytes: function(str) {
+            const bytes = [];
+            for (let i = 0; i < str.length; i++) {
+                bytes.push(str.charCodeAt(i));
+            }
+            return bytes;
+        },
+        base64ToBytes: function(base64) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+            let len = base64.length;
+            while (len > 0 && base64[len - 1] === '=') len--;
+            const bytes = [];
+            for (let i = 0; i < len; i += 4) {
+                const c0 = chars.indexOf(base64[i]);
+                const c1 = chars.indexOf(base64[i + 1]);
+                const c2 = chars.indexOf(base64[i + 2]);
+                const c3 = chars.indexOf(base64[i + 3]);
+                bytes.push((c0 << 2) | (c1 >> 4));
+                if (i + 2 < len) bytes.push(((c1 & 15) << 4) | (c2 >> 2));
+                if (i + 3 < len) bytes.push(((c2 & 3) << 6) | c3);
+            }
+            return bytes;
+        },
+        bytesToBase64: function(bytes) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
+            let result = '';
+            for (let i = 0; i < bytes.length; i += 3) {
+                const a = bytes[i];
+                const b = bytes[i + 1] || 0;
+                const c = bytes[i + 2] || 0;
+                result += chars[a >> 2];
+                result += chars[((a & 3) << 4) | (b >> 4)];
+                result += i + 1 < bytes.length ? chars[((b & 15) << 2) | (c >> 6)] : '=';
+                result += i + 2 < bytes.length ? chars[c & 63] : '=';
+            }
+            return result;
+        },
+        padPKCS7: function(data, blockSize) {
+            const pad = blockSize - (data.length % blockSize);
+            for (let i = 0; i < pad; i++) {
+                data.push(pad);
+            }
+            return data;
+        },
+        aesEcbEncrypt: function(data, key) {
+            const result = [];
+            for (let i = 0; i < data.length; i += 16) {
+                const block = data.slice(i, i + 16);
+                const encrypted = this.aesBlockEncrypt(block, key);
+                result.push(...encrypted);
+            }
+            return result;
+        },
+        aesCbcEncrypt: function(data, key, iv) {
+            const result = [];
+            let prev = iv.slice();
+            for (let i = 0; i < data.length; i += 16) {
+                const block = data.slice(i, i + 16);
+                const xored = block.map((b, j) => b ^ prev[j]);
+                const encrypted = this.aesBlockEncrypt(xored, key);
+                prev = encrypted;
+                result.push(...encrypted);
+            }
+            return result;
+        },
+        aesBlockEncrypt: function(block, key) {
+            const sbox = [
+                0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+                0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+                0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+                0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+                0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+                0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+                0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+                0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+                0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+                0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+                0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+                0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+                0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+                0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+                0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+                0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+            ];
+            const rcon = [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36];
+            
+            let state = block.slice();
+            const keyExpanded = this.keyExpansion(key, rcon);
+            
+            state = this.addRoundKey(state, keyExpanded.slice(0, 16));
+            
+            for (let round = 1; round <= 10; round++) {
+                state = this.subBytes(state, sbox);
+                state = this.shiftRows(state);
+                if (round < 10) state = this.mixColumns(state);
+                state = this.addRoundKey(state, keyExpanded.slice(round * 16, (round + 1) * 16));
+            }
+            
+            return state;
+        },
+        keyExpansion: function(key, rcon) {
+            const expanded = [];
+            for (let i = 0; i < key.length; i++) expanded.push(key[i]);
+            
+            for (let i = 16; i < 176; i += 4) {
+                const temp = expanded.slice(i - 4, i);
+                if (i % 16 === 0) {
+                    const rotated = temp.slice(1).concat(temp[0]);
+                    for (let j = 0; j < 4; j++) {
+                        temp[j] = this.subWord(rotated[j]);
+                    }
+                    temp[0] ^= rcon[i / 16];
+                }
+                for (let j = 0; j < 4; j++) {
+                    expanded.push(expanded[i - 16 + j] ^ temp[j]);
+                }
+            }
+            return expanded;
+        },
+        subWord: function(byte) {
+            const sbox = [
+                0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
+                0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
+                0xb7, 0xfd, 0x93, 0x26, 0x36, 0x3f, 0xf7, 0xcc, 0x34, 0xa5, 0xe5, 0xf1, 0x71, 0xd8, 0x31, 0x15,
+                0x04, 0xc7, 0x23, 0xc3, 0x18, 0x96, 0x05, 0x9a, 0x07, 0x12, 0x80, 0xe2, 0xeb, 0x27, 0xb2, 0x75,
+                0x09, 0x83, 0x2c, 0x1a, 0x1b, 0x6e, 0x5a, 0xa0, 0x52, 0x3b, 0xd6, 0xb3, 0x29, 0xe3, 0x2f, 0x84,
+                0x53, 0xd1, 0x00, 0xed, 0x20, 0xfc, 0xb1, 0x5b, 0x6a, 0xcb, 0xbe, 0x39, 0x4a, 0x4c, 0x58, 0xcf,
+                0xd0, 0xef, 0xaa, 0xfb, 0x43, 0x4d, 0x33, 0x85, 0x45, 0xf9, 0x02, 0x7f, 0x50, 0x3c, 0x9f, 0xa8,
+                0x51, 0xa3, 0x40, 0x8f, 0x92, 0x9d, 0x38, 0xf5, 0xbc, 0xb6, 0xda, 0x21, 0x10, 0xff, 0xf3, 0xd2,
+                0xcd, 0x0c, 0x13, 0xec, 0x5f, 0x97, 0x44, 0x17, 0xc4, 0xa7, 0x7e, 0x3d, 0x64, 0x5d, 0x19, 0x73,
+                0x60, 0x81, 0x4f, 0xdc, 0x22, 0x2a, 0x90, 0x88, 0x46, 0xee, 0xb8, 0x14, 0xde, 0x5e, 0x0b, 0xdb,
+                0xe0, 0x32, 0x3a, 0x0a, 0x49, 0x06, 0x24, 0x5c, 0xc2, 0xd3, 0xac, 0x62, 0x91, 0x95, 0xe4, 0x79,
+                0xe7, 0xc8, 0x37, 0x6d, 0x8d, 0xd5, 0x4e, 0xa9, 0x6c, 0x56, 0xf4, 0xea, 0x65, 0x7a, 0xae, 0x08,
+                0xba, 0x78, 0x25, 0x2e, 0x1c, 0xa6, 0xb4, 0xc6, 0xe8, 0xdd, 0x74, 0x1f, 0x4b, 0xbd, 0x8b, 0x8a,
+                0x70, 0x3e, 0xb5, 0x66, 0x48, 0x03, 0xf6, 0x0e, 0x61, 0x35, 0x57, 0xb9, 0x86, 0xc1, 0x1d, 0x9e,
+                0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf,
+                0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
+            ];
+            return sbox[byte];
+        },
+        subBytes: function(state, sbox) {
+            return state.map(b => sbox[b]);
+        },
+        shiftRows: function(state) {
+            const result = state.slice();
+            result[1] = state[5]; result[5] = state[9]; result[9] = state[13]; result[13] = state[1];
+            result[2] = state[10]; result[6] = state[14]; result[10] = state[2]; result[14] = state[6];
+            result[3] = state[15]; result[7] = state[11]; result[11] = state[15]; result[15] = state[7];
+            return result;
+        },
+        mixColumns: function(state) {
+            const result = new Array(16);
+            const mul = [
+                [2, 3, 1, 1], [1, 2, 3, 1], [1, 1, 2, 3], [3, 1, 1, 2]
+            ];
+            for (let col = 0; col < 4; col++) {
+                for (let row = 0; row < 4; row++) {
+                    let val = 0;
+                    for (let i = 0; i < 4; i++) {
+                        val ^= this.gfMult(mul[row][i], state[col * 4 + i]);
+                    }
+                    result[row * 4 + col] = val;
+                }
+            }
+            return result;
+        },
+        gfMult: function(a, b) {
+            let p = 0;
+            for (let i = 0; i < 8; i++) {
+                if (b & 1) p ^= a;
+                const hiBit = a & 0x80;
+                a <<= 1;
+                if (hiBit) a ^= 0x1b;
+                b >>= 1;
+            }
+            return p;
+        },
+        addRoundKey: function(state, key) {
+            return state.map((s, i) => s ^ key[i]);
         }
     };
 
@@ -1154,12 +1422,12 @@
     }
 
     // --- 肥猫 ---
-    async function feimaoGetMusicUrl(platform, songInfo, quality) {
-        const id = getSongId(platform, songInfo);
+    // 注意：此函数接收(source, songInfo, quality)，source已由PLATFORM_TO_SOURCE转换
+    async function feimaoGetMusicUrl(source, songInfo, quality) {
+        const id = getSongId(source, songInfo) || (songInfo || {}).hash || (songInfo || {}).songmid || (songInfo || {}).id;
         if (!id) throw new Error('肥猫: 缺少歌曲ID');
-        const xinghaiPlatform = PLATFORM_TO_XINGHAI[platform] || platform;
         const br = QUALITY_TO_BR[quality] || '320';
-        const res = await httpGet(CONFIG.FEIMAO_API_URL, { types: 'url', id: id, type: xinghaiPlatform, br: br }, 10000);
+        const res = await httpGet(CONFIG.FEIMAO_API_URL, { types: 'url', id: id, type: source, br: br }, 10000);
         const url = extractUrl(res, '肥猫');
         if (url) return validateUrl(url, '肥猫');
         throw new Error('肥猫: 无数据');
@@ -1178,24 +1446,24 @@
     }
 
     // --- 梓澄公益 ---
-    async function zichengGetMusicUrl(platform, songInfo, quality) {
-        const id = getSongId(platform, songInfo);
+    // 注意：此函数接收(source, songInfo, quality)，source已由PLATFORM_TO_SOURCE转换
+    async function zichengGetMusicUrl(source, songInfo, quality) {
+        const id = getSongId(source, songInfo) || (songInfo || {}).hash || (songInfo || {}).songmid || (songInfo || {}).id;
         if (!id) throw new Error('梓澄公益: 缺少歌曲ID');
-        const xinghaiPlatform = PLATFORM_TO_XINGHAI[platform] || platform;
         const br = QUALITY_TO_BR[quality] || '320';
-        const res = await httpGet(CONFIG.ZICHENG_API_URL, { types: 'url', id: id, type: xinghaiPlatform, br: br }, 10000);
+        const res = await httpGet(CONFIG.ZICHENG_API_URL, { types: 'url', id: id, type: source, br: br }, 10000);
         const url = extractUrl(res, '梓澄公益');
         if (url) return validateUrl(url, '梓澄公益');
         throw new Error('梓澄公益: 无数据');
     }
 
     // --- 無名 ---
-    async function wumingGetMusicUrl(platform, songInfo, quality) {
-        const id = getSongId(platform, songInfo);
+    // 注意：此函数接收(source, songInfo, quality)，source已由PLATFORM_TO_SOURCE转换
+    async function wumingGetMusicUrl(source, songInfo, quality) {
+        const id = getSongId(source, songInfo) || (songInfo || {}).hash || (songInfo || {}).songmid || (songInfo || {}).id;
         if (!id) throw new Error('無名: 缺少歌曲ID');
-        const xinghaiPlatform = PLATFORM_TO_XINGHAI[platform] || platform;
         const br = QUALITY_TO_BR[quality] || '320';
-        const res = await httpGet(CONFIG.WUMING_API_URL, { types: 'url', id: id, type: xinghaiPlatform, br: br }, 10000);
+        const res = await httpGet(CONFIG.WUMING_API_URL, { types: 'url', id: id, type: source, br: br }, 10000);
         const url = extractUrl(res, '無名');
         if (url) return validateUrl(url, '無名');
         throw new Error('無名: 无数据');
@@ -1315,24 +1583,24 @@
     }
 
     // --- ikun (通用) ---
-    async function ikunGetMusicUrl(platform, songInfo, quality) {
-        const id = getSongId(platform, songInfo);
+    // 注意：此函数接收(source, songInfo, quality)，source已由PLATFORM_TO_SOURCE转换
+    async function ikunGetMusicUrl(source, songInfo, quality) {
+        const id = getSongId(source, songInfo) || (songInfo || {}).hash || (songInfo || {}).songmid || (songInfo || {}).id;
         if (!id) throw new Error('ikun: 缺少歌曲ID');
-        const ikunPlatform = PLATFORM_TO_SOURCE[platform]?.ikun || platform;
         const br = QUALITY_TO_BR[quality] || '320';
-        const res = await httpGet(CONFIG.IKUN_API_URL, { server: 'netease', type: 'url', id: id, platform: ikunPlatform, br: br }, 10000);
+        const res = await httpGet(CONFIG.IKUN_API_URL, { server: 'netease', type: 'url', id: id, platform: source, br: br }, 10000);
         const url = extractUrl(res, 'ikun');
         if (url) return validateUrl(url, 'ikun');
         throw new Error('ikun: 无数据');
     }
 
     // --- ikun香港 ---
-    async function ikunHKGetMusicUrl(platform, songInfo, quality) {
-        const id = getSongId(platform, songInfo);
+    // 注意：此函数接收(source, songInfo, quality)，source已由PLATFORM_TO_SOURCE转换
+    async function ikunHKGetMusicUrl(source, songInfo, quality) {
+        const id = getSongId(source, songInfo) || (songInfo || {}).hash || (songInfo || {}).songmid || (songInfo || {}).id;
         if (!id) throw new Error('ikunHK: 缺少歌曲ID');
-        const ikunPlatform = PLATFORM_TO_SOURCE[platform]?.ikun || platform;
         const br = QUALITY_TO_BR[quality] || '320';
-        const res = await httpGet(CONFIG.IKUN_HK_API_URL, { server: 'netease', type: 'url', id: id, platform: ikunPlatform, br: br }, 10000);
+        const res = await httpGet(CONFIG.IKUN_HK_API_URL, { server: 'netease', type: 'url', id: id, platform: source, br: br }, 10000);
         const url = extractUrl(res, 'ikunHK');
         if (url) return validateUrl(url, 'ikunHK');
         throw new Error('ikunHK: 无数据');
@@ -1417,8 +1685,9 @@
     }
 
     // --- 汽水VIP ---
-    async function qishuiGetMusicUrl(platform, songInfo, quality) {
-        const id = getSongId(platform, songInfo);
+    // 注意：此函数只接收(songInfo, quality)两个参数，由handler.noPlatform标记控制
+    async function qishuiGetMusicUrl(songInfo, quality) {
+        const id = (songInfo || {}).songmid || (songInfo || {}).hash || (songInfo || {}).id;
         const name = (songInfo || {}).name || (songInfo || {}).title || '';
         const singer = (songInfo || {}).singer || (songInfo || {}).artist || '';
         if (!id && !name) throw new Error('汽水VIP: 缺少歌曲信息');
@@ -1497,6 +1766,62 @@
         }
     }
 
+    // ==================== 聚合API (来自 7.0.7) ====================
+    async function juheGetMusicUrl(source, musicInfo, quality) {
+        const platformMap = {
+            'tx': 'qq', 'wy': 'netease', 'kw': 'kuwo', 'kg': 'kugou', 'mg': 'migu'
+        };
+        const src = platformMap[source] || source;
+        const songId = musicInfo.songmid || musicInfo.hash || musicInfo.id;
+
+        if (!songId) throw new Error('聚合API: 缺少歌曲ID');
+
+        const res = await httpPost(
+            `${CONFIG.JUHE_API_URL}/${src}`,
+            { id: String(songId), quality: quality || '320k' },
+            CONFIG.REQUEST_TIMEOUT
+        );
+
+        if (!res) throw new Error('聚合API返回空响应');
+
+        if (res.code === 200 && res.data?.url) {
+            return validateUrl(res.data.url, '聚合API');
+        }
+
+        if (res.code === 303 && res.data) {
+            try {
+                const data = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+                const reqData = data.request || {};
+                const respData = data.response || {};
+
+                const nestedRes = await httpFetch(encodeURI(reqData.url || ''), reqData.options || {});
+
+                let value = nestedRes.body;
+                const checkKeys = respData.check?.key || [];
+                for (const key of checkKeys) {
+                    if (value == null) break;
+                    value = value[key];
+                }
+
+                if (value === respData.check?.value) {
+                    let url = nestedRes.body;
+                    const urlKeys = respData.url || [];
+                    for (const key of urlKeys) {
+                        if (url == null) break;
+                        url = url[key];
+                    }
+                    if (url && HTTP_REGEX.test(url)) {
+                        return validateUrl(url, '聚合API(303)');
+                    }
+                }
+            } catch (e) {
+                throw new Error(`聚合API 303处理失败: ${e.message || e}`);
+            }
+        }
+
+        throw new Error(res.msg || res.message || '聚合API请求失败');
+    }
+
     // ==================== SourceHandler 类（来自 9.0.9）====================
     class SourceHandler {
         constructor(name, fn, priority, opts = {}) {
@@ -1505,6 +1830,8 @@
             this.priority = priority;
             this.timeout = opts.timeout || CONFIG.REQUEST_TIMEOUT;
             this.supportedPlatforms = opts.supportedPlatforms || [];
+            this.requireSource = !!opts.requireSource;
+            this.noPlatform = !!opts.noPlatform;
             this.needUrlValidation = opts.needUrlValidation !== false;
             this.cacheResults = opts.cacheResults !== false;
         }
@@ -1515,37 +1842,42 @@
     }
 
     // ==================== 音源处理器注册表 ====================
+    // 特殊标记说明：
+    // - noPlatform: true 表示不需要传递platform参数，只传(musicInfo, quality)
+    // - requireSource: true 表示需要传递source参数（如ikun、肥猫等）
+    // 优先级：数字越小优先级越高（1为最高优先级）
     const SOURCE_HANDLERS = [
-        new SourceHandler('GD音乐台', gdGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('CHKSZ', chkszGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('肥猫', feimaoGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('小熊猫', xiaoxiongmaoGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('梓澄公益', zichengGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('無名', wumingGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('六音', liuyinGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('星海主', xinghaiMainGetMusicUrl, 9, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('星海备', xinghaiBackupGetMusicUrl, 9, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('长青SVIP', changqingGetMusicUrl, 8, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('念心SVIP', nianxinGetMusicUrl, 8, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('溯音QQ', suyinQQGetMusicUrl, 8, { supportedPlatforms: ['tx'] }),
-        new SourceHandler('溯音163', suyin163GetMusicUrl, 8, { supportedPlatforms: ['wy'] }),
-        new SourceHandler('溯音酷我', suyinKuwoGetMusicUrl, 8, { supportedPlatforms: ['kw'] }),
-        new SourceHandler('溯音咪咕', suyinMiguGetMusicUrl, 8, { supportedPlatforms: ['mg'] }),
-        new SourceHandler('ikun', ikunGetMusicUrl, 7, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('ikunHK', ikunHKGetMusicUrl, 7, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('聚合API', juheGetMusicUrl, 1, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('GD音乐台', gdGetMusicUrl, 2, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('CHKSZ', chkszGetMusicUrl, 2, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('肥猫', feimaoGetMusicUrl, 3, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'], requireSource: true }),
+        new SourceHandler('小熊猫', xiaoxiongmaoGetMusicUrl, 3, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('梓澄公益', zichengGetMusicUrl, 3, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'], requireSource: true }),
+        new SourceHandler('無名', wumingGetMusicUrl, 3, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'], requireSource: true }),
+        new SourceHandler('六音', liuyinGetMusicUrl, 4, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('星海主', xinghaiMainGetMusicUrl, 5, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('星海备', xinghaiBackupGetMusicUrl, 5, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('长青SVIP', changqingGetMusicUrl, 6, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('念心SVIP', nianxinGetMusicUrl, 6, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
+        new SourceHandler('溯音QQ', suyinQQGetMusicUrl, 6, { supportedPlatforms: ['tx'] }),
+        new SourceHandler('溯音163', suyin163GetMusicUrl, 6, { supportedPlatforms: ['wy'] }),
+        new SourceHandler('溯音酷我', suyinKuwoGetMusicUrl, 6, { supportedPlatforms: ['kw'] }),
+        new SourceHandler('溯音咪咕', suyinMiguGetMusicUrl, 6, { supportedPlatforms: ['mg'] }),
+        new SourceHandler('ikun', ikunGetMusicUrl, 7, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'], requireSource: true }),
+        new SourceHandler('ikunHK', ikunHKGetMusicUrl, 7, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'], requireSource: true }),
         new SourceHandler('野草', yecaoGetMusicUrl, 7, { supportedPlatforms: ['kw'] }),
         new SourceHandler('fish', fishGetMusicUrl, 7, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] }),
-        new SourceHandler('qorg', qorgHandlerGetMusicUrl, 6, { supportedPlatforms: ['wy', 'wycloudmusic'] }),
-        new SourceHandler('wyqlm', wyqlmHandlerGetMusicUrl, 6, { supportedPlatforms: ['wy', 'wycloudmusic'] }),
-        new SourceHandler('网易云官方', neteaseOfficialGetMusicUrl, 5, { supportedPlatforms: ['wy', 'wycloudmusic'] }),
-        new SourceHandler('汽水VIP', qishuiGetMusicUrl, 4, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'] })
+        new SourceHandler('qorg', qorgHandlerGetMusicUrl, 8, { supportedPlatforms: ['wy', 'wycloudmusic'] }),
+        new SourceHandler('wyqlm', wyqlmHandlerGetMusicUrl, 8, { supportedPlatforms: ['wy', 'wycloudmusic'] }),
+        new SourceHandler('网易云官方', neteaseOfficialGetMusicUrl, 9, { supportedPlatforms: ['wy', 'wycloudmusic'] }),
+        new SourceHandler('汽水VIP', qishuiGetMusicUrl, 10, { supportedPlatforms: ['tx', 'wy', 'kw', 'kg', 'mg'], noPlatform: true })
     ];
 
     // ==================== 获取指定平台的音源处理器 ====================
     function getHandlersForPlatform(platform) {
         return SOURCE_HANDLERS
             .filter(h => h.supportsPlatform(platform))
-            .sort((a, b) => b.priority - a.priority);
+            .sort((a, b) => a.priority - b.priority);
     }
 
     // ==================== 终极兜底 ====================
@@ -1571,84 +1903,213 @@
         throw new Error('终极兜底: 失败');
     }
 
-    // ==================== 核心：并发获取URL（成功即停 + 缓存）====================
-    async function getUrlWithFallback(platform, musicInfo, quality) {
-        state.stats.requests++;
-        const cacheKey = SafeUtils.buildCacheKey('url', musicInfo, quality);
+    // ==================== 试听音源尝试（最后的退路）====================
+    async function tryTrialSource(platform, musicInfo, quality) {
+        console.log(`[试听音源] 尝试获取试听地址 (平台:${platform})`);
+        try {
+            const id = getSongId(platform, musicInfo);
+            if (!id) {
+                console.warn('[试听音源] 无法获取歌曲ID');
+                return '';
+            }
 
-        // 检查缓存
+            // 尝试网易云官方接口获取试听
+            if (platform === 'wy' || platform === 'wycloudmusic') {
+                try {
+                    const d = { ids: `[${id}]`, br: 320000 };
+                    const eapiUrl = '/api/song/enhance/player/url';
+                    const eapiData = freelistenWyEapi(eapiUrl, d);
+                    let cookie = 'os=pc';
+                    if (CONFIG.NETEASE_CLOUD_COOKIE_KEY) cookie = CONFIG.NETEASE_CLOUD_COOKIE_KEY + '; ' + cookie;
+                    const targetUrl = 'https://interface3.music.163.com/eapi/song/enhance/player/url';
+                    const resp = await httpFetch(targetUrl, {
+                        method: 'POST', form: eapiData, headers: { cookie }
+                    });
+                    const resData = resp.body;
+                    if (resData?.data && resData.data[0]?.url) {
+                        const url = resData.data[0].url;
+                        console.log(`[试听音源] 获取到试听地址: ${url.substring(0, 60)}...`);
+                        return url;
+                    }
+                } catch (e) {
+                    console.warn('[试听音源] 网易云接口失败:', e.message);
+                }
+            }
+
+            // 尝试 qorg 的不加密接口
+            try {
+                const url = `${CONFIG.QORG_API_URL}/song/url?id=${id}&br=320000`;
+                const res = await httpGet(url, {}, CONFIG.REQUEST_TIMEOUT);
+                if (res?.code === 200 && Array.isArray(res.data) && res.data[0]?.url) {
+                    console.log(`[试听音源] qorg获取到地址: ${res.data[0].url.substring(0, 60)}...`);
+                    return res.data[0].url;
+                }
+            } catch (e) {
+                console.warn('[试听音源] qorg接口失败:', e.message);
+            }
+
+        } catch (e) {
+            console.error('[试听音源] 失败:', e.message);
+        }
+        return '';
+    }
+
+    // ==================== 核心：播放地址获取（自动换源 + 成功即停）====================
+    async function getUrlWithFallback(platform, musicInfo, quality) {
+        if (!platform) throw new Error('无效平台');
+        if (!musicInfo || typeof musicInfo !== 'object') throw new Error('无效歌曲信息');
+
+        state.stats.requests++;
+        const q = quality || '320k';
+        const cacheKey = SafeUtils.buildCacheKey(platform, musicInfo, q);
+
+        // 检查缓存并验证有效性
         const cached = state.urlCache.get(cacheKey);
         if (cached && cached.url && (Date.now() - cached.time < CONFIG.CACHE_TTL_URL)) {
-            state.stats.hits++;
-            console.log(`[缓存命中] ${cached.source} → ${cached.url.substring(0, 80)}...`);
-            return cached.url;
+            try {
+                const isValid = await validateAudioUrl(cached.url, CONFIG.URL_CHECK_TIMEOUT);
+                if (isValid) {
+                    state.stats.hits++;
+                    console.log(`[缓存命中] ${cached.source} → ${cached.url.substring(0, 80)}...`);
+                    return cached.url;
+                } else {
+                    console.warn(`[缓存失效] ${cached.source} URL已不可达，删除缓存`);
+                    state.urlCache.delete(cacheKey);
+                }
+            } catch (e) {
+                state.urlCache.delete(cacheKey);
+            }
         }
         state.stats.misses++;
 
-        const handlers = getHandlersForPlatform(platform);
-        let lastError = null;
-        let aborted = false;
-
-        // 并发请求所有音源，成功即停
-        const promises = handlers.map(async (handler) => {
-            let retries = 0;
-            while (retries <= CONFIG.MAX_RETRIES && !aborted) {
-                try {
-                    if (aborted) throw new Error('已中止');
-                    const url = await withTimeout(
-                        handler.fn(platform, musicInfo, quality),
-                        handler.timeout,
-                        `${handler.name}: 超时`
-                    );
-                    if (url && !aborted) {
-                        aborted = true;
-                        // 缓存结果
-                        state.urlCache.set(cacheKey, { url, source: handler.name, time: Date.now() });
-                        // 清理过期缓存
-                        if (state.urlCache.size > CONFIG.CACHE_MAX_SIZE) {
-                            const oldestKey = [...state.urlCache.entries()]
-                                .sort((a, b) => a[1].time - b[1].time)[0][0];
-                            state.urlCache.delete(oldestKey);
-                        }
-                        state.stats.success++;
-                        console.log(`[${handler.name}] 成功获取 → ${url.substring(0, 80)}...`);
-                        return url;
-                    }
-                    throw new Error('无有效URL');
-                } catch (e) {
-                    if (aborted) throw new Error('已中止');
-                    lastError = e;
-                    if (retries < CONFIG.MAX_RETRIES) {
-                        await new Promise(r => setTimeout(r, CONFIG.RETRY_DELAY));
-                    }
-                    retries++;
-                }
-            }
-            if (!aborted) {
-                console.warn(`[${handler.name}] 失败: ${lastError ? lastError.message : '未知错误'}`);
-            }
-            throw lastError || new Error(`${handler.name}: 失败`);
-        });
-
-        // 竞争：只要有一个成功就返回
-        try {
-            const result = await Promise.any(promises);
-            return result;
-        } catch (e) {
-            console.warn('[聚合音源] 所有音源均失败，启动终极兜底...');
-            try {
-                const url = await ultimateFallback(platform, musicInfo, quality);
-                if (url) {
-                    state.urlCache.set(cacheKey, { url, source: '终极兜底', time: Date.now() });
-                    state.stats.success++;
-                    return url;
-                }
-            } catch (ue) {
-                console.error('[终极兜底] 失败:', ue.message);
-            }
-            state.stats.fail++;
-            throw new Error('所有音源和兜底方案均失败');
+        // 检查是否有进行中的相同请求（请求复用）
+        const reqKey = `${platform}_${cacheKey}`;
+        if (state.activeRequests.has(reqKey)) {
+            console.log(`[请求复用] ${platform} - ${musicInfo.name || '未知歌曲'}`);
+            return state.activeRequests.get(reqKey);
         }
+
+        // 创建请求Promise并注册到activeRequests
+        const promise = (async () => {
+            try {
+                const handlers = getHandlersForPlatform(platform);
+
+                if (handlers.length === 0) {
+                    console.warn(`[聚合音源] 没有常规音源处理器，走终极兜底`);
+                    const fallbackUrl = await ultimateFallback(platform, musicInfo, q);
+                    if (fallbackUrl) {
+                        state.urlCache.set(cacheKey, { url: fallbackUrl, source: '终极兜底', time: Date.now() });
+                        return fallbackUrl;
+                    }
+                    return await tryTrialSource(platform, musicInfo, q);
+                }
+
+                // ==================== 优先音源处理（qorg/wyqlm）====================
+                const priorityHandlers = handlers.filter(h => h.name === 'qorg' || h.name === 'wyqlm');
+                for (const handler of priorityHandlers) {
+                    try {
+                        console.log(`[优先音源] 尝试: ${handler.name} (${platform})`);
+                        const timeout = handler.timeout || CONFIG.REQUEST_TIMEOUT;
+                        let url;
+
+                        if (handler.noPlatform) {
+                            url = await withTimeout(handler.fn(musicInfo, q), timeout, handler.name + '超时');
+                        } else if (handler.requireSource) {
+                            const source = PLATFORM_TO_SOURCE[platform]?.ikun || platform;
+                            url = await withTimeout(handler.fn(source, musicInfo, q), timeout, handler.name + '超时');
+                        } else {
+                            url = await withTimeout(handler.fn(platform, musicInfo, q), timeout, handler.name + '超时');
+                        }
+
+                        const validated = validateUrl(url, handler.name);
+                        
+                        state.urlCache.set(cacheKey, { url: validated, source: handler.name, time: Date.now() });
+                        state.stats.success++;
+                        console.log(`[优先音源] ${handler.name} 成功，直接返回`);
+                        return validated;
+                    } catch (e) {
+                        console.warn(`[优先音源] ${handler.name} 失败: ${e.message}`);
+                    }
+                }
+
+                // ==================== 其他音源并发轮询 ====================
+                const otherHandlers = handlers.filter(h => h.name !== 'qorg' && h.name !== 'wyqlm');
+                const errors = [];
+                let completed = false;
+                let resultUrl = null;
+
+                const promises = otherHandlers.map(async (handler) => {
+                    if (completed) return;
+                    try {
+                        console.log(`[聚合音源] 尝试: ${handler.name} (${platform})`);
+                        const timeout = handler.timeout || CONFIG.REQUEST_TIMEOUT;
+                        let url;
+
+                        // 根据handler类型决定参数传递方式
+                        if (handler.noPlatform) {
+                            // 汽水VIP等特殊音源：只传(musicInfo, quality)
+                            url = await withTimeout(handler.fn(musicInfo, q), timeout, handler.name + '超时');
+                        } else if (handler.requireSource) {
+                            // ikun、肥猫等需要source参数的音源
+                            const source = PLATFORM_TO_SOURCE[platform]?.ikun || platform;
+                            url = await withTimeout(handler.fn(source, musicInfo, q), timeout, handler.name + '超时');
+                        } else if (handler.name === '聚合API') {
+                            // 聚合API特殊处理
+                            url = await withTimeout(handler.fn(platform, { musicInfo: musicInfo, type: q }), timeout, handler.name + '超时');
+                        } else {
+                            // 普通音源：传(platform, musicInfo, quality)
+                            url = await withTimeout(handler.fn(platform, musicInfo, q), timeout, handler.name + '超时');
+                        }
+
+                        if (completed) return;
+
+                        const validated = validateUrl(url, handler.name);
+
+                        // 可选URL有效性预检
+                        if (handler.needUrlValidation) {
+                            const isReachable = await validateAudioUrl(validated, CONFIG.URL_CHECK_TIMEOUT);
+                            if (!isReachable) throw new Error(`${handler.name}: URL不可达`);
+                        }
+
+                        if (!completed) {
+                            completed = true;
+                            resultUrl = validated;
+                            state.urlCache.set(cacheKey, { url: validated, source: handler.name, time: Date.now() });
+                            state.stats.success++;
+                            console.log(`[聚合音源] ${handler.name} 成功，停止其他请求`);
+                        }
+                    } catch (e) {
+                        errors.push(`${handler.name}: ${e.message}`);
+                        console.warn(`[聚合音源] ${handler.name} 失败: ${e.message}`);
+                    }
+                });
+
+                await Promise.all(promises);
+
+                if (resultUrl) {
+                    return resultUrl;
+                }
+
+                // ==================== 所有常规音源失败，尝试终极兜底 ====================
+                console.warn(`[聚合音源] 所有常规音源失败，开始终极兜底 (平台:${platform})`);
+                const fallbackUrl = await ultimateFallback(platform, musicInfo, q);
+                if (fallbackUrl) {
+                    state.urlCache.set(cacheKey, { url: fallbackUrl, source: '终极兜底', time: Date.now() });
+                    state.stats.success++;
+                    return fallbackUrl;
+                }
+
+                // ==================== 最后尝试试听音源 ====================
+                return await tryTrialSource(platform, musicInfo, q);
+
+            } finally {
+                // 清理请求记录
+                state.activeRequests.delete(reqKey);
+            }
+        })();
+
+        state.activeRequests.set(reqKey, promise);
+        return promise;
     }
 
     // ==================== 预加载管理器（来自 7.0.7）====================
@@ -1824,21 +2285,8 @@
     // ==================== 发送公告 ====================
     function sendAnnouncement() {
         if (state.announcementSent) return;
-        if (!send || typeof send !== 'function') {
-            console.warn('[聚合音源] send API 不可用');
-            return;
-        }
-        try {
-            send(EVENT_NAMES.updateAlert, {
-                title: ANNOUNCEMENT.title,
-                content: ANNOUNCEMENT.content,
-                version: ANNOUNCEMENT.version
-            });
-            state.announcementSent = true;
-            console.log('[聚合音源] 公告已发送');
-        } catch (e) {
-            console.warn('[聚合音源] 发送公告失败:', e.message);
-        }
+        state.announcementSent = true;
+        try { send && send(EVENT_NAMES.updateAlert, { log: ANNOUNCEMENT.content }); } catch(e) {}
     }
 
     // ==================== 初始化 ====================

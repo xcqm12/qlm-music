@@ -1,13 +1,13 @@
 # 🎵 七零喵聚合音源 · 超级整合版
 
-![version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![version](https://img.shields.io/badge/version-1.0.2-blue.svg)
 ![license](https://img.shields.io/badge/license-学习交流-green.svg)
 ![platform](https://img.shields.io/badge/平台-洛雪音乐-orange.svg)
 ![stars](https://img.shields.io/github/stars/xcqm12/qlm-music?style=social)
 
 ## 📖 项目简介
 
-**七零喵聚合音源** 是为 [洛雪音乐（LX Music）](https://github.com/lyswhut/lx-music-desktop) 设计的超级整合版音源脚本，集成 **28 余种音源 API**，支持 **weapi/eapi** 双加密，基于 v7.0.7 架构重构，整合 v9.0.9 全部音源，打造新一代重构版 1.0.0。
+**七零喵聚合音源** 是为 [洛雪音乐（LX Music）](https://github.com/lyswhut/lx-music-desktop) 设计的终极整合版音源脚本，集成 **20+ 优质音源**，完整重写基于 **7.0.7 + 9.0.9 + v7.1.2-ultimate-fix-v3.7** 所有优点：保留9.0.9音源名称及地址配置、保留qorg完整九重回退链、全音源并发搜索+成功即停、智能缓存+终极兜底、修复 `sendAnnouncement` 参数错误、试听检测逻辑保持不变，打造稳定可靠的 v1.0.2。
 
 > 🎵 让音乐播放不再中断，让搜索更加智能。
 
@@ -29,6 +29,11 @@
 - **智能 URL 提取与验证**：内置 `extractUrl` / `deepExtractUrl` 函数，深度递归提取各音源返回结构中的音频链接；`validateAudioUrl` 预检发送 HEAD 请求验证链接；可选启用避免返回无效链接
 - **长青/念心 SVIP 增强**：增加 URL 可达性强制验证，避免返回不可播放的链接
 - **Free listen 酷我/酷狗改造**：复用肥猫音源，提升稳定性
+- **全音源并发搜索 + 成功即停（v1.0.2 核心特性）**：所有音源独立运行互不干扰，并发请求，任一音源成功获取URL立即停止其他请求，确保最快响应速度
+- **智能缓存（v1.0.2）**：URL缓存30分钟、搜索缓存5分钟，成功获取立即缓存，下次播放直接命中缓存实现秒播
+- **音源参数传递修正（v1.0.2）**：修复不同音源的参数传递方式，noPlatform(汽水VIP)/requireSource(ikun/肥猫/梓澄/無名)/普通模式，确保所有音源正确调用
+- **URLSearchParams Polyfill（v1.0.2）**：新增 URLSearchParams Polyfill，确保在旧环境（Hermes引擎）下正常构建请求参数
+- **聚合API支持（v1.0.2）**：添加来自 7.0.7 的 juhe 聚合API，支持 303 重定向处理
 
 ### 🎵 音乐平台支持
 - **QQ音乐 / 网易云音乐 / 酷我音乐 / 酷狗音乐 / 咪咕音乐**：全平台覆盖
@@ -93,12 +98,12 @@ https://cdn.jsdelivr.net/gh/xcqm12/qlm-music/qlm-v1.0.0-integrated.js
 
 ## 📦 版本选择
 
-> **🔥 最新发布版：`qlm-v1.0.0-integrated.js`**  
-> 重构优化版 1.0.0-integrated，基于 v7.0.7、v9.0.9 和 v7.1.2-ultimate-fix-v3.7 整合重构，修复初始化失败问题和lxmusic兼容性问题。
+> **🔥 最新发布版：`qlm-v1.0.0-integrated.js` (v1.0.2)**  
+> 终极整合版 v1.0.2，完整重写基于 7.0.7 + 9.0.9 + v3.7 所有优点：保留9.0.9音源配置、qorg九重回退链、全音源并发+成功即停、智能缓存、终极兜底、音源参数修正，确保正常播放和LX Music初始化。
 
 | 版本 | 状态 | 说明 | 推荐场景 |
 |-----|-----|-----|------|
-| **qlm-v1.0.0-integrated** | ⭐ **最新强烈推荐** | 重构优化版qlm-v1.0.0-integrated，基于 v7.0.7、v9.0.9 和 v7.1.2-ultimate-fix-v3.7 整合重构；qorg音源保留v9.0.9完整实现（九重回退机制）；所有音源优化重构；修复初始化失败问题（移除Node.js依赖，兼容浏览器环境）；修复lxmusic兼容性问题（改为自执行函数模式）；修复 qorg 无数据问题（对齐 9.0.9 HTTP 函数：添加 User-Agent、过滤空参数、重试机制） | 所有用户 |
+| **qlm-v1.0.0-integrated** | ⭐ **最新强烈推荐 v1.0.2** | 终极整合版 v1.0.2，完整重写基于 7.0.7 + 9.0.9 + v3.7 所有优点：保留9.0.9音源名称及地址配置；保留qorg完整九重回退链（不加密→weapi→eapi→v1→v1/302→lossless→多ID→降级→music/url→跨平台）；**全音源并发搜索+成功即停机制**；**智能缓存**（30分钟URL缓存、5分钟搜索缓存）；**终极兜底**（跨平台自动切换）；**修复音源参数传递**（noPlatform/requireSource/普通模式）；**URLSearchParams Polyfill**；**修复 sendAnnouncement 参数错误**（log is required）；**试听检测逻辑保持不变**（不默认返回试听文件）；正常播放和获取地址；正常LX Music初始化 | 所有用户 |
 | **qlm-v1.0.0** | ✅ 可用 | 重构版 1.0.0，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源；修复初始化失败、not a function 错误、缺失音源函数等问题；修复 qorg 无数据问题（对齐 9.0.9 HTTP 函数：添加 User-Agent、过滤空参数、重试机制） | 历史版本兼容 |
 | qlm-v9.0.0 | ✅ 可用 | 旗舰整合版，集成最新优化和增强功能 | 历史版本兼容 |
 | v7.1.2-ultimate-merged-v5.2-enhanced | ⭐ 推荐 | 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长青 SVIP 增强，跨平台支持完善 | 若不需要最新版本可继续使用 |
@@ -319,7 +324,8 @@ graph TD
 
 | 版本 | 日期 | 更新内容 |
 |-----|------|---------|
-| **qlm-v1.0.0-integrated** | 2026 | 🎉 **重构优化版 1.0.0-integrated**，基于 v7.0.7、v9.0.9 和 v7.1.2-ultimate-fix-v3.7 整合重构；**qorg音源保留v9.0.9完整实现**（九重回退机制：`/song/url` → weapi → eapi → `/song/url/v1` → `/song/url/v1/302` → lossless → 多ID → 低音质降级 → `/music/url`；搜索补全ID；试听检测）；所有音源优化重构，支持独立运行和音源搜索；完善错误处理和日志记录；终极兜底跨平台切换（kg→kw→tx→wy）；添加 extractUrl/deepExtractUrl 智能URL提取；**修复初始化失败问题**（移除Node.js crypto依赖，使用纯JavaScript MD5实现，使用XMLHttpRequest替代fetch，兼容浏览器环境）；**修复lxmusic兼容性问题**（改为自执行函数模式，添加事件监听器机制，兼容lxmusic插件API）；**修复 qorg 无数据问题**（对齐 9.0.9 HTTP 函数：`httpGet`/`httpGetRedirect` 添加 User-Agent 请求头、过滤空参数、集成 `httpRequestWithRetry` 重试机制；`httpFetch` 替换为 9.0.9 版本；`qorgSearch` 移除 try-catch 让错误正常传播） |
+| **qlm-v1.0.0-integrated v1.0.2** | 2026 | 🏆 **终极整合版 v1.0.2**，完整重写基于 7.0.7 + 9.0.9 + v3.7 所有优点：<br>• **保留9.0.9音源配置**：完整音源名称及地址配置<br>• **保留qorg完整九重回退链**：不加密→weapi→eapi→v1→v1/302→lossless→多ID→音质降级→music/url→跨平台兜底<br>• **全音源并发搜索+成功即停**：所有音源独立运行互不干扰，一个成功立即停止<br>• **智能缓存机制**：30分钟URL缓存、5分钟搜索缓存，成功即缓存<br>• **终极兜底**：所有音源失败后自动跨平台切换(kg→kw→tx→wy)<br>• **修复音源参数传递**：noPlatform(汽水VIP)/requireSource(ikun/肥猫)/普通模式<br>• **URLSearchParams Polyfill**：确保旧环境兼容<br>• **正常播放和获取地址**：所有音源正常工作<br>• **正常LX Music初始化**：完整事件监听和配置注册<br>• **修复 sendAnnouncement 参数错误**：修复 "log is required" 错误，参数格式对齐 9.0.9 版本<br>• **试听检测逻辑保持不变**：不默认返回试听文件，仅在所有音源失败后作为最后的退路尝试 |
+| **qlm-v1.0.0-integrated v1.0.1** | 2026 | 🎉 **重构优化版 1.0.0-integrated**，基于 v7.0.7、v9.0.9 和 v7.1.2-ultimate-fix-v3.7 整合重构；**qorg音源保留v9.0.9完整实现**（九重回退机制：`/song/url` → weapi → eapi → `/song/url/v1` → `/song/url/v1/302` → lossless → 多ID → 低音质降级 → `/music/url`；搜索补全ID；试听检测）；所有音源优化重构，支持独立运行和音源搜索；完善错误处理和日志记录；终极兜底跨平台切换（kg→kw→tx→wy）；添加 extractUrl/deepExtractUrl 智能URL提取；**修复初始化失败问题**（移除Node.js crypto依赖，使用纯JavaScript MD5实现，使用XMLHttpRequest替代fetch，兼容浏览器环境）；**修复lxmusic兼容性问题**（改为自执行函数模式，添加事件监听器机制，兼容lxmusic插件API）；**修复 qorg 无数据问题**（对齐 9.0.9 HTTP 函数：`httpGet`/`httpGetRedirect` 添加 User-Agent 请求头、过滤空参数、集成 `httpRequestWithRetry` 重试机制；`httpFetch` 替换为 9.0.9 版本；`qorgSearch` 移除 try-catch 让错误正常传播） |
 | **qlm-v1.0.0** | 2026 | 🎉 **重构版 1.0.0**，基于 v7.0.7 架构重构，整合 v9.0.9 全部 28+ 音源；修复初始化失败问题；修复 not a function 错误；修复 Network request failed 问题；修复 星海备缺少歌曲ID 问题；**修复 qorg 音源完整版**（根据 api.qlm.org.cn 文档实现：9接口回退机制 `/song/url` → weapi → eapi → `/song/url/v1` → `/song/url/v1/302` → lossless → 多ID → 低音质降级 → `/music/url`；增加试听检测功能；增加搜索补全ID功能；增加网易云加密工具 weapi/eapi）；**修复 qorg 无数据问题**（对齐 9.0.9 HTTP 函数：`httpGet`/`httpGetRedirect` 添加 User-Agent 请求头、过滤空参数、集成 `httpRequestWithRetry` 重试机制；`httpFetch` 替换为 9.0.9 版本；`qorgSearch` 移除 try-catch 让错误正常传播）；添加缺失的音源处理函数（肥猫不肥、梓澄qwq、梓澄公益2代、聚合API、野花野草、Meting、Free listen、独家音源）；添加 PLATFORM_TO_SOURCE 配置；添加 httpFetch 工具函数；**修复汽水VIP配置**（将平台限制改为 `qsvip`，添加平台检查，增加超时配置）；添加缺失配置 `QISHUI_API_HTTP` 和 `QISHUI_PROXY_API`；添加 `qsvip` 平台支持；**添加终极兜底机制**（跨平台切换：kg→kw→tx→wy，搜索补全ID，URL可达性验证，试听检测）；添加 `extractUrl` 和 `deepExtractUrl` 工具函数 |
 | qlm-v9.0.0 | 2026 | 🎉 旗舰整合版，集成最新增强优化 |
 | v7.1.2-ultimate-merged-v5.2-enhanced | 2026 | 🏆 旗舰整合版，整合汽水VIP全功能（搜索+歌词），优化回退链、修复 freelisten/fish ID缺失、念心长青 SVIP 增强，跨平台支持完善 |
@@ -335,7 +341,7 @@ graph TD
 | v7.1.2-ultimate-fix-v2 | 2026 | ⭐ 终极修复版 v2，完善 weapi/eapi 双加密，修复 ID 缺失及 303 重定向处理，增强稳定性 |
 | … | … | 更早版本见原仓库记录 |
 
-> **2026 全新重构分支**：`qlm-v1.0.0-integrated` 为最新重构版本，基于 v7.0.7 架构重构，整合 v9.0.9 全部音源。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
+> **2026 终极整合版**：`qlm-v1.0.0-integrated` **v1.0.2** 为最新重写版本，完整整合 **7.0.7 + 9.0.9 + v3.7** 所有优点：保留9.0.9音源名称及地址配置、保留qorg完整九重回退链、**全音源并发搜索+成功即停机制**、智能缓存+终极兜底、音源参数传递修正，确保所有音频地址正常工作、正常播放获取地址、正常LX Music初始化。`v3.8` ~ `v5.1` 为过渡开发版本，已弃用。
 
 ---
 
@@ -356,7 +362,7 @@ graph TD
 · ✅ 终极兜底与自动跳歌（v3.7）
 · ✅ 旗舰整合版 v5.2-enhanced（汽水VIP全功能、修复增强、多平台完善）
 · ✅ 旗舰版 v9.0.0（最新增强与优化）
-· ✅ **重构版 1.0.0-integrated**（基于 v7.0.7 架构重构，整合 v9.0.9 全部音源）
+· ✅ **终极整合版 1.0.2-integrated**（完整重写：保留9.0.9音源配置+qorg九重回退+全音源并发+成功即停+智能缓存+终极兜底+参数修正）
 · ⬜ 图形化配置界面
 · ⬜ 音源健康检测
 · ⬜ 自定义音源优先级
