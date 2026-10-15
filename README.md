@@ -1,6 +1,7 @@
 # 七零喵 x 星海 聚合音源 · 整合版
 
 [![版本](https://img.shields.io/badge/version-v1.1.0--integrated-blue.svg)](./qlm-v1.1.0-integrated.js)
+[![Release](https://img.shields.io/github/v/release/xcqm12/qlm-music.svg)](https://github.com/xcqm12/qlm-music/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-green.svg)](LICENSE)
 
 > 整合七零喵(qorg/wyqlm/CHKSZ/肥猫/小熊猫等)和星海(本地直连/后端聚合/签名认证/智能匹配)的 LX Music 音源脚本
@@ -8,6 +9,8 @@
 ## 简介
 
 本项目是七零喵团队与星海合作的聚合音源整合版，基于 xinghai-music-source v3.2.15 和 qlm-v9.0.9 整合而成。提供多个音源聚合、智能匹配、试听检测、缓存管理等功能。
+
+除聚合整合版外，另提供独立的**网易云官方音源** `netease-official-source.js`（混淆发行版），直接调用 NeteaseCloudMusicApiEnhanced 接口获取网易云播放地址。
 
 ## 功能特性
 
@@ -22,6 +25,7 @@
 - **eapi/weapi 加密** - 网易云音乐加密支持
 - **顺序执行** - 避免竞态条件，提升稳定性
 - **自动更新** - 内置版本检查和更新提示
+- **网易云官方独立音源** - `netease-official-source.js`，基于 api.qlm.org.cn 三级降级获取网易云播放地址（详见下方章节）
 
 ## 支持音源
 
@@ -41,15 +45,39 @@
 | 16 | 汽水VIP | 咪咕 |
 | 兜底 | 星海备用 → GD备用 → 试听片段 | — |
 
+上表为整合版 `qlm-v1.1.0-integrated.js` 的内部降级链；独立版 `netease-official-source.js` 只注册网易云（wy）一个源。
+
+## 网易云官方独立音源
+
+`netease-official-source.js` 是独立的网易云官方音源（混淆发行版），基于
+[NeteaseCloudMusicApiEnhanced](https://api.qlm.org.cn/docs/#/?id=neteasecloudmusicapienhanced)
+（`https://api.qlm.org.cn`）获取播放地址：
+
+- **三级降级** - `/song/url/v1`（音质等级 level）→ `/song/url`（码率 br）→ `/song/url/match`（灰色歌曲解锁）
+- **歌名兜底** - songId 缺失或失效时通过 `/cloudsearch` 重新解析歌曲 ID
+- **试听检测** - 识别 `freeTrialInfo` / `freeTrialAudition` 试听片段
+- **免 Cookie 可用** - 未配置 Cookie 时仍可获取免费音质；**文件不内置任何 Cookie**（公开仓库不存放个人登录态）
+- **Cookie 配置** - 登录音质需自行提供网易云 Cookie（值含 `MUSIC_U=`），通过 storage 键
+  `netease_official_cookie` 写入音源运行环境（详见文件头注释）；该配置依赖应用运行环境，
+  未配置或未生效时自动按免费音质处理
+- **音质映射** - 应用内音质选项为 LX Music 网易云源固定支持的 `128k / 320k / flac / flac24bit`，
+  脚本内部已映射至接口 level/br 参数（标准 → 臻品母带全等级）
+- **稳定请求** - 15s 超时，失败自动重试并追加时间戳参数绕过服务端缓存
+
+> 注意：启用该独立源时仅网易云（wy）平台可用；需要全平台聚合请使用 `qlm-v1.1.0-integrated.js`。
+> 两个文件可在"自定义源"列表中分别导入并切换，同一时间仅一个音源生效。
+
 ## 使用方法
 
 ### 安装
 
-1. 下载 `qlm-v1.1.0-integrated.js` 文件
+1. 下载 `qlm-v1.1.0-integrated.js` 文件，或从
+   [Releases](https://github.com/xcqm12/qlm-music/releases) 下载整包
+   `qlm-music-all-v1.1.0.zip`（全部音源文件）
 2. 打开 LX Music 应用
-3. 进入设置 -> 音源设置
-4. 选择"自定义源"，导入下载的 JS 文件
-5. 启用需要的音源
+3. 进入设置 -> 音源设置 -> 自定义源
+4. 导入下载的 JS 文件并启用
+5. 可导入多个自定义源（如整合版与网易云官方独立版）并切换，同一时间仅一个生效
 
 ### 配置说明
 
@@ -97,12 +125,24 @@ KW_DECRYPT_PROXY: { allowEncryptedLossless: false }, // 无解密代理时音质
 
 ```
 .
-├── qlm-v1.1.0-integrated.js    # 主音源脚本 (整合版)
-├── README.md                    # 本文件
-└── LICENSE                      # 许可证
+├── qlm-v1.1.0-integrated.js      # 主音源脚本（整合版，推荐）
+├── netease-official-source.js    # 网易云官方独立音源（混淆版，不内置 Cookie）
+├── qlm-v1.0.0-integrated.js      # 上一整合版本
+├── qlm-v7.x / v9.0.0 系列        # 七零喵历史版本存档
+├── qlm-fix-*.js / *ultimate*     # 历史修复版存档
+├── README.md                     # 本文件
+├── LICENSE                       # 许可证
+└── .github/FUNDING.yml           # 赞助配置
 ```
 
 ## 更新日志
+
+### netease-official-source.js v1.0.0（2026-10-15）
+
+- 新增网易云官方独立音源（混淆发行版），基于 NeteaseCloudMusicApiEnhanced（api.qlm.org.cn）
+- 三级降级获取播放地址，支持灰色歌曲解锁、歌名解析兜底与试听检测
+- 不内置 Cookie（公开仓库不存放登录态），免费音质开箱即用，登录音质可通过 storage 键配置
+- 发布正式版整包 [Release v1.1.0](https://github.com/xcqm12/qlm-music/releases/tag/v1.1.0)
 
 ### v1.1.0-integrated
 
@@ -126,6 +166,8 @@ KW_DECRYPT_PROXY: { allowEncryptedLossless: false }, // 无解密代理时音质
 ## 链接
 
 - GitHub: https://github.com/xcqm12/qlm-music
+- Releases: https://github.com/xcqm12/qlm-music/releases
+- 网易云接口文档: https://api.qlm.org.cn/docs
 - 星海: https://yy.zddyr.top/ (主) / https://zrcdy.dpdns.org/ (备)
 
 ## 免责声明
