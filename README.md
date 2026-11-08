@@ -1,6 +1,6 @@
 # 七零喵 x 星海 聚合音源 · 整合版
 
-[![版本](https://img.shields.io/badge/version-v2.0.0-blue.svg)](./netease-official-source.js)
+[![版本](https://img.shields.io/badge/version-v2.2.0-blue.svg)](./netease-official-source.js)
 [![Release](https://img.shields.io/github/v/release/xcqm12/qlm-music.svg)](https://github.com/xcqm12/qlm-music/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-green.svg)](LICENSE)
 
@@ -8,7 +8,7 @@
 
 ## 简介
 
-本项目是**结合星海的聚合音源整合版**。主文件 `netease-official-source.js`（v2.0.0，混淆发行版）以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（酷我本地直连 / 星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用。
+本项目是**结合星海的聚合音源整合版**。主文件 `netease-official-source.js`（v2.2.0，混淆发行版）以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用。
 
 另保留全聚合降级链版 `qlm-v1.1.0-integrated.js`（七零喵全系音源 + 星海，18+1 处理器），供需要多后端聚合的用户选用。
 
@@ -16,7 +16,7 @@
 
 - **官方五级降级** - `/song/url/v1` → 服务端解灰 → 客户端下载链路 → 旧版码率接口 → 灰色歌曲解锁，逐级自动切换
 - **星海全平台兜底** - 官方链路失败后自动切换星海渠道，后端主备域名自动切换
-- **酷我本地直连** - 无需第三方后端（无解密代理时音质封顶 flac）
+- **酷我后端直取** - 音质兜底、短链签名、加密解密全部在星海服务端完成（v3.2.18 起不再本地直连）
 - **星海后端聚合** - 支持网易/QQ/酷我/酷狗/咪咕/**汽水音乐**
 - **X-Token/X-Client 认证** - 支持星海签名认证机制
 - **智能匹配** - 歌名/歌手智能匹配，songId 缺失时自动搜索补全
@@ -32,7 +32,7 @@
 |------|-----------|------|
 | 网易云 (wy) | 128k / 320k / flac / flac24bit | 官方接口优先，星海兜底 |
 | QQ音乐 (tx) | 128k / 192k / 320k / flac / hires / atmos / master | 星海渠道 |
-| 酷我 (kw) | 128k / 320k / flac | 本地直连优先 |
+| 酷我 (kw) | 128k / 320k / flac | 星海后端直取 |
 | 酷狗 (kg) | 128k / 320k / flac / hires / atmos / master | 星海渠道 |
 | 咪咕 (mg) | 128k / 320k / flac | 星海渠道 |
 | 汽水 (qs) | 128k / 320k / flac / spatial / hires | 星海渠道 |
@@ -41,7 +41,7 @@
 
 ## 降级链
 
-### 独立整合版 `netease-official-source.js`（v2.0.0）
+### 独立整合版 `netease-official-source.js`（v2.2.0）
 
 ```
 网易云 (wy):
@@ -50,7 +50,7 @@
   → /song/url/match (灰色歌曲解锁)
   → 星海备用: CHKSZ(可选) → 星海后端聚合 → GD音乐台
 
-酷我 (kw):  本地直连（多渠道码率链） → 星海后端聚合
+酷我 (kw):  星海后端聚合（服务端完成签名/解密）
 QQ (tx):    CHKSZ(可选) → 星海后端聚合
 酷狗/咪咕:  星海后端聚合
 汽水 (qs):  星海后端聚合（抖音流）
@@ -94,9 +94,8 @@ QQ (tx):    CHKSZ(可选) → 星海后端聚合
 // CHKSZ 配置（api.chksz.com 接口需要 apikey，为空时该渠道自动跳过）
 CHKSZ_CONFIG: { apikey: '' },
 
-// 酷我本地直连
-KW_LOCAL_CONFIG: { enabled: true },
-KW_DECRYPT_PROXY: { allowEncryptedLossless: false }, // 无解密代理时音质封顶 flac
+// 酷我加密链接解密代理（可选；无解密代理时音质封顶 flac）
+KW_DECRYPT_PROXY: { allowEncryptedLossless: false },
 
 // 超时配置
 TIMEOUT: 15000,  // 请求超时时间 (15秒)
@@ -121,7 +120,7 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 
 ```
 .
-├── netease-official-source.js    # 结合星海的聚合整合版（v2.0.0，混淆发行版，推荐）
+├── netease-official-source.js    # 结合星海的聚合整合版（v2.2.0，混淆发行版，推荐）
 ├── qlm-v1.1.0-integrated.js      # 全聚合降级链版（七零喵全系 + 星海）
 ├── qlm-v1.0.0-integrated.js      # 上一整合版本
 ├── qlm-v7.x / v9.0.0 系列        # 七零喵历史版本存档
@@ -132,6 +131,13 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 ```
 
 ## 更新日志
+
+### netease-official-source.js v2.2.0（2026-11-08）
+
+- **同步星海 v3.2.17 / v3.2.18**：星海后端改为服务端签发 X-Token 鉴权、仅主域名
+- **酷我修复**：统一走星海后端取链（音质兜底、短链签名、加密解密在服务端完成），移除本地直连模块，修复部分歌曲取链失败
+- 酷我音质最高只留无损：上游 master/hires 与 flac 实为同一文件（16bit/44.1kHz）
+- 更新内置 Cookie 登录态
 
 ### netease-official-source.js v2.0.0（2026-10-17）
 
