@@ -1,6 +1,6 @@
 # 七零喵 x 星海 聚合音源 · 整合版
 
-[![版本](https://img.shields.io/badge/version-v2.2.0-blue.svg)](./netease-official-source.js)
+[![版本](https://img.shields.io/badge/version-v2.3.0-blue.svg)](./netease-official-source.js)
 [![Release](https://img.shields.io/github/v/release/xcqm12/qlm-music.svg)](https://github.com/xcqm12/qlm-music/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-green.svg)](LICENSE)
 
@@ -8,7 +8,7 @@
 
 ## 简介
 
-本项目是**结合星海的聚合音源整合版**。主文件 `netease-official-source.js`（v2.2.0，混淆发行版）以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用。
+本项目是**结合星海的聚合音源整合版**。主文件 `netease-official-source.js`（v2.3.0，混淆发行版）以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用。**已做 ES5 降级与旧引擎兼容，车机 / 旧版 WebView 可直接加载。**
 
 另保留全聚合降级链版 `qlm-v1.1.0-integrated.js`（七零喵全系音源 + 星海，18+1 处理器），供需要多后端聚合的用户选用。
 
@@ -17,6 +17,7 @@
 - **官方五级降级** - `/song/url/v1` → 服务端解灰 → 客户端下载链路 → 旧版码率接口 → 灰色歌曲解锁，逐级自动切换
 - **星海全平台兜底** - 官方链路失败后自动切换星海渠道，后端主备域名自动切换
 - **酷我后端直取** - 音质兜底、短链签名、加密解密全部在星海服务端完成（v3.2.18 起不再本地直连）
+- **车机兼容** - ES5 语法降级 + 内建兼容层（不改写全局对象），旧版 WebView / 低配车机可正常加载
 - **星海后端聚合** - 支持网易/QQ/酷我/酷狗/咪咕/**汽水音乐**
 - **X-Token/X-Client 认证** - 支持星海签名认证机制
 - **智能匹配** - 歌名/歌手智能匹配，songId 缺失时自动搜索补全
@@ -41,7 +42,7 @@
 
 ## 降级链
 
-### 独立整合版 `netease-official-source.js`（v2.2.0）
+### 独立整合版 `netease-official-source.js`（v2.3.0）
 
 ```
 网易云 (wy):
@@ -120,7 +121,8 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 
 ```
 .
-├── netease-official-source.js    # 结合星海的聚合整合版（v2.2.0，混淆发行版，推荐）
+├── netease-official-source.js    # 结合星海的聚合整合版（v2.3.0，混淆发行版，推荐）
+├── build-es5.js                  # ES5 兼容构建脚本（改明文源后重新生成车机版）
 ├── qlm-v1.1.0-integrated.js      # 全聚合降级链版（七零喵全系 + 星海）
 ├── qlm-v1.0.0-integrated.js      # 上一整合版本
 ├── qlm-v7.x / v9.0.0 系列        # 七零喵历史版本存档
@@ -131,6 +133,14 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 ```
 
 ## 更新日志
+
+### netease-official-source.js v2.3.0（2026-11-10）
+
+- **修复车机无法加载自定义音源**：源码此前含 `async/await`、`let/const`、箭头函数等 ES2015+ 语法，车机端旧 WebView（Chromium 37~60）解析失败导致整份脚本加载不出来；现所有发行文件均为 ES5 语法
+- 移除对 `Set` / `Map` 的依赖，改用普通对象（省去旧引擎的 polyfill 负担）
+- 新增内建兼容层：`Object.assign` / `Object.entries` 缺失时使用局部实现，**不改写任何全局对象**（避免沙箱冻结内建对象时报错）
+- 混淆改为「兼容档」：保留 RC4 字符串加密、字符串拆分、索引偏移、函数包装器等强度，关闭控制流平坦化与自保护——这两项在弱 CPU 车机与受限沙箱中易导致加载慢或失败
+- 附 `build-es5.js` 构建脚本，后续更新可一键重新产出 ES5 版本
 
 ### netease-official-source.js v2.2.0（2026-11-08）
 
