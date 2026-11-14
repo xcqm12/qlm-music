@@ -8,7 +8,10 @@
 
 ## 简介
 
-本项目是**结合星海的聚合音源整合版**。主文件 `netease-official-source.js`（v2.4.0，超强混淆发行版）以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用。**已做 ES5 语法降级与旧引擎兼容层；v2.4.0 起发行版采用超强混淆（控制流平坦化 + 自保护），语法层仍兼容旧 WebView，低配车机首次加载会略慢。**
+本项目是**结合星海的聚合音源整合版**。发行文件以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用，**已做 ES5 语法降级与旧引擎兼容层**。两份发行文件二选一导入：
+
+- `netease-official-source.js` — **超强混淆**（控制流平坦化 + 自保护），桌面 / 手机用，体积大、逆向成本高
+- `netease-official-source-car.js` — **车机兼容档**（同一份 v2.4.0 源码，关闭控制流平坦化与自保护），弱 CPU 车机 / 旧版 WebView 加载更快更稳，推荐车机用户使用
 
 另保留全聚合降级链版 `qlm-v1.1.0-integrated.js`（七零喵全系音源 + 星海，18+1 处理器），供需要多后端聚合的用户选用。
 
@@ -81,7 +84,8 @@ QQ (tx):    CHKSZ(可选) → 星海后端聚合
 
 ### 安装
 
-1. 下载 `netease-official-source.js`（推荐）或 `qlm-v1.1.0-integrated.js`，或从
+1. 下载 `netease-official-source.js`（桌面 / 手机推荐）或 `netease-official-source-car.js`（**车机 / 旧版 WebView 推荐**），
+   或 `qlm-v1.1.0-integrated.js`，或从
    [Releases](https://github.com/xcqm12/qlm-music/releases) 下载整包
    `qlm-music-all-v1.1.0.zip`（全部音源文件）
 2. 打开 LX Music 应用
@@ -123,9 +127,10 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 
 ```
 .
-├── netease-official-source.js    # 结合星海的聚合整合版（v2.4.0，超强混淆发行版，推荐）
-├── build-es5.js                  # ES5 兼容构建脚本（改明文源后重新生成车机版）
-├── qlm-v1.1.0-integrated.js      # 全聚合降级链版（七零喵全系 + 星海）
+├── netease-official-source.js       # 聚合整合版主文件（v2.4.0，超强混淆，桌面/手机）
+├── netease-official-source-car.js   # 车机兼容版（v2.4.0，兼容档混淆，旧 WebView 推荐）
+├── build-es5.js                     # ES5 兼容构建脚本（改明文源后重新生成车机版）
+├── qlm-v1.1.0-integrated.js         # 全聚合降级链版（七零喵全系 + 星海）
 ├── qlm-v1.0.0-integrated.js      # 上一整合版本
 ├── qlm-v7.x / v9.0.0 系列        # 七零喵历史版本存档
 ├── qlm-fix-*.js / *ultimate*     # 历史修复版存档
@@ -143,6 +148,7 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 - **兼容新版 LX**：版本号优先取 `lx.currentScriptInfo.version`，`lx.env` 同时支持字符串与对象形态，修复 UA 中出现 `[object Object]` 的问题
 - **混淆升级为超强档**：控制流平坦化 0.75 + 自保护 + 3 层字符串包装器 + 索引偏移 + 字符串拆分 + 数字表达式化 + 六边形标识符（仍为 ES5 语法）
 - 注意：自保护模式下请勿格式化或二次修改发行文件，否则会自毁；车机如需更快启动可自行用 `build-es5.js` 产出后按兼容档混淆
+- **新增车机兼容版发行文件 [`netease-official-source-car.js`](./netease-official-source-car.js)**：同一份 v2.4.0 源码，按「兼容档」混淆——关闭控制流平坦化与自保护，保留 RC4 字符串加密、字符串拆分、索引偏移、函数包装器等强度；体积约为超强档一半（198KB / 401KB），弱 CPU 车机与旧版 WebView 首次加载明显更快更稳
 
 ### netease-official-source.js v2.3.0（2026-11-10）
 
