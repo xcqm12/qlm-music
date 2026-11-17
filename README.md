@@ -1,6 +1,6 @@
 # 七零喵 x 星海 聚合音源 · 整合版
 
-[![版本](https://img.shields.io/badge/version-v2.4.0-blue.svg)](./netease-official-source.js)
+[![版本](https://img.shields.io/badge/version-v2.5.0-blue.svg)](./netease-official-source.js)
 [![Release](https://img.shields.io/github/v/release/xcqm12/qlm-music.svg)](https://github.com/xcqm12/qlm-music/releases)
 [![License](https://img.shields.io/badge/license-GPL--3.0-green.svg)](LICENSE)
 
@@ -11,7 +11,7 @@
 本项目是**结合星海的聚合音源整合版**。发行文件以网易云官方接口（api.qlm.org.cn）为第一优先，官方链路未命中时自动切换星海渠道（星海后端聚合 / GD音乐台），一个脚本覆盖 `wy / tx / kw / kg / mg / qs` 六个平台，开箱即用，**已做 ES5 语法降级与旧引擎兼容层**。两份发行文件二选一导入：
 
 - `netease-official-source.js` — **超强混淆**（控制流平坦化 + 自保护），桌面 / 手机用，体积大、逆向成本高
-- `netease-official-source-car.js` — **车机兼容档**（同一份 v2.4.0 源码，关闭控制流平坦化与自保护），弱 CPU 车机 / 旧版 WebView 加载更快更稳，推荐车机用户使用
+- `netease-official-source-car-v2.5.0.js` — **车机兼容档**（同一份 v2.5.0 源码，关闭控制流平坦化与自保护），弱 CPU 车机 / 旧版 WebView 加载更快更稳，推荐车机用户使用；旧版 `netease-official-source-car.js` 为 v2.4.0 存档
 
 另保留全聚合降级链版 `qlm-v1.1.0-integrated.js`（七零喵全系音源 + 星海，18+1 处理器），供需要多后端聚合的用户选用。
 
@@ -47,7 +47,7 @@
 
 ## 降级链
 
-### 独立整合版 `netease-official-source.js`（v2.4.0）
+### 独立整合版 `netease-official-source.js`（v2.5.0）
 
 ```
 网易云 (wy):
@@ -84,7 +84,7 @@ QQ (tx):    CHKSZ(可选) → 星海后端聚合
 
 ### 安装
 
-1. 下载 `netease-official-source.js`（桌面 / 手机推荐）或 `netease-official-source-car.js`（**车机 / 旧版 WebView 推荐**），
+1. 下载 `netease-official-source.js`（桌面 / 手机推荐）或 `netease-official-source-car-v2.5.0.js`（**车机 / 旧版 WebView 推荐**），
    或 `qlm-v1.1.0-integrated.js`，或从
    [Releases](https://github.com/xcqm12/qlm-music/releases) 下载整包
    `qlm-music-all-v1.1.0.zip`（全部音源文件）
@@ -127,8 +127,9 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 
 ```
 .
-├── netease-official-source.js       # 聚合整合版主文件（v2.4.0，超强混淆，桌面/手机）
-├── netease-official-source-car.js   # 车机兼容版（v2.4.0，兼容档混淆，旧 WebView 推荐）
+├── netease-official-source.js             # 聚合整合版主文件（v2.5.0，超强混淆，桌面/手机）
+├── netease-official-source-car-v2.5.0.js  # 车机兼容版（v2.5.0，兼容档混淆，旧 WebView 推荐）
+├── netease-official-source-car.js         # 车机兼容版 v2.4.0（历史存档）
 ├── build-es5.js                     # ES5 兼容构建脚本（改明文源后重新生成车机版）
 ├── qlm-v1.1.0-integrated.js         # 全聚合降级链版（七零喵全系 + 星海）
 ├── qlm-v1.0.0-integrated.js      # 上一整合版本
@@ -140,6 +141,14 @@ TIMEOUT: 15000,  // 请求超时时间 (15秒)
 ```
 
 ## 更新日志
+
+### netease-official-source.js v2.5.0（2026-11-17）
+
+- **同步星海 v3.2.20**：新增启动域名连通性自检（只探主/备 API 域名，状态与耗时写入日志，不阻塞初始化），更新服务不可用（网络失败或 5xx）时提示手动查看更新
+- **更新内置 Cookie 登录态**：轮换 MUSIC_U（0040C803…）及 JSESSIONID / WM_NI / WM_NIKE / gdxidpyhdxE 等会话键，新增 timing_user_id
+- **日志安全化**：内建 LOG 封装，受限沙箱缺失 console 时静默，避免启动即报错
+- **商用级超强混淆**：控制流平坦化 0.75 + 自保护 + 3 层字符串包装器 + 索引偏移 + 字符串拆分 + 数字表达式化 + 六边形标识符（仍为 ES5 语法，体积 464KB）
+- **车机兼容版改用新文件名** [`netease-official-source-car-v2.5.0.js`](./netease-official-source-car-v2.5.0.js)：同源、兼容档混淆（关 CFF / 自保护），体积约 202KB，旧车机加载更快更稳
 
 ### netease-official-source.js v2.4.0（2026-11-14）
 
